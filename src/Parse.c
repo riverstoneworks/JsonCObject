@@ -26,12 +26,12 @@ enum{
 
 static int convert(const regex_t*,char* , ObjectInfo* const );
 
-static ObjectInfo* getValueByKey(const char* key,const ObjectInfo* const obj ){
-	int i=0,list_size=obj->size[1];
+static const ObjectInfo* const getValueByKey(const char* key,const ObjectInfo* const obj ){
+	int i=0,list_size=obj->typeInf->size[1];
 
-	while(list_size>i&&strcmp(key,obj->subObjInfo[i].name))++i;
+	while(list_size>i&&strcmp(key,obj->typeInf->subObjInfo[i].name))++i;
 
-	return i<list_size?obj->subObjInfo+i:NULL;
+	return i<list_size?obj->typeInf->subObjInfo+i:NULL;
 }
 
 static inline int verify(const char *_string, const regex_t *p_re){
@@ -72,7 +72,7 @@ static int numeric_conver(char* _string, ObjectInfo* const numeric,const regex_t
 	long double ld=(long double)0.0;
 
 	if(*_string=='-'){
-		if(numeric->type[0]>=UINT)	return -1;
+		if(numeric->typeInf->type[0]>=UINT)	return -1;
 		++_string;
 		c=-1;
 	}else if(*_string=='+'){
@@ -87,7 +87,7 @@ static int numeric_conver(char* _string, ObjectInfo* const numeric,const regex_t
 	}
 	ld = (lh*=c) + ld * c;
 
-	switch(numeric->type[0]){
+	switch(numeric->typeInf->type[0]){
 		case FLOAT: *(float*)(numeric->obj_addr)=ld; break;
 		case DOUBLE: *(double*)(numeric->obj_addr)=ld; break;
 		case LDOUBLE: *(long double*)(numeric->obj_addr)=ld;break;
@@ -107,7 +107,7 @@ static int numeric_conver(char* _string, ObjectInfo* const numeric,const regex_t
 //string[size,pointer_to_string] the format of _string: "..."
 static int string_conver(char* _string, ObjectInfo* const string,const regex_t *p_re){
 
-	int l=strlen(_string)-2,n=string->size[0]-1;
+	int l=strlen(_string)-2,n=string->typeInf->size[0]-1;
 
 	if((l=l>n?n:l)<0)
 		return -1;
@@ -129,11 +129,11 @@ static int boolean_conver(char* _string, ObjectInfo* const boolean,const regex_t
 static int array_conver(char* _string, ObjectInfo* const array,const regex_t *p_re){
 	++_string;
 	_string[strlen(_string)-1]='\0';
-	int m_size=1,err_no = 0,ii,i=0,ele_size=array->size[0];
+	int m_size=1,err_no = 0,ii,i=0,ele_size=array->typeInf->size[0];
 
 	regmatch_t match={0};
 	char tmp;
-	while(!(err_no = regexec(p_re+J_R_GET_ARRAY_ELEMENT, _string, m_size, &match, 0))&&array->size[1]>0) {
+	while(!(err_no = regexec(p_re+J_R_GET_ARRAY_ELEMENT, _string, m_size, &match, 0))&&array->typeInf->size[1]>0) {
 		tmp=_string[match.rm_eo];
 		_string[match.rm_eo]='\0';
 
@@ -141,11 +141,11 @@ static int array_conver(char* _string, ObjectInfo* const array,const regex_t *p_
 		if(ii>-1){
 			if(verify(_string+match.rm_so,p_re+J_R_ARRAY)){
 				array->obj_addr+=ele_size;
-				array->size[1]--;
+				((enum E*)(array->typeInf->size))[1]--;
 				i++;
 			}else{
 				array->obj_addr+=ele_size*ii;
-				array->size[1]-=ii;
+				((enum E*)(array->typeInf->size))[1]-=ii;
 				i+=ii;
 			}
 		}
@@ -158,7 +158,7 @@ static int array_conver(char* _string, ObjectInfo* const array,const regex_t *p_
 
 	}
 	array->obj_addr-=ele_size*i;
-	array->size[1]+=i;
+	((enum E*)(array->typeInf->size))[1]+=i;
 
 	_string[strlen(_string)]=']';
 	return i;
@@ -211,9 +211,9 @@ static int convert(const regex_t *p_re, char* _string, ObjectInfo* const objectI
 	if(i>J_R_BOOLEAN)
 		return -1;
 
-	if((i==ARRAY&&ARRAY==objectInfo->type[1])
-			||(i==J_R_NUMBER&&objectInfo->type[0]>=INT)
-			||(i!=0&&i==objectInfo->type[0])){
+	if((i==ARRAY&&ARRAY==objectInfo->typeInf->type[1])
+			||(i==J_R_NUMBER&&objectInfo->typeInf->type[0]>=INT)
+			||(i!=0&&i==objectInfo->typeInf->type[0])){
 		return conver_by_type[i](_string,objectInfo,p_re);
 	}else
 		return -1;
