@@ -8,7 +8,7 @@
 #ifndef PARSE_H_
 #define PARSE_H_
 
-typedef struct OBJECT_INFO ObjectInfo;
+//typedef struct OBJECT_INFO ObjectInfo;
 struct OBJECT_INFO{
 	const char* name;
 	enum E{
@@ -35,14 +35,14 @@ struct OBJECT_INFO{
 };
 
 //Improve
-struct OBJECT_INF;
+typedef struct OBJECT_INF ObjectInfo;
 struct TYPE_INF{
 	const char* name;
 	enum E const  type[2];
 	//size[0] is size of base type (int,float etc.) or length of string or element size in array;  size[1] is element number in array
 	const size_t size[2];
 	//the *object int objectinfo array is the offset for attributes of STRUCT
-	const struct OBJECT_INF* const subObjInfo;
+	const struct ObjectInfo* const subObjInfo;
 };
 
 struct OBJECT_INF{
