@@ -72,7 +72,7 @@ static int numeric_conver(char* _string, ObjectInfo* const numeric,const regex_t
 	long double ld=(long double)0.0;
 
 	if(*_string=='-'){
-		if(numeric->typeInf->type[0]>=UINT)	return -1;
+		if(numeric->typeInf->type>=UINT)	return -1;
 		++_string;
 		c=-1;
 	}else if(*_string=='+'){
@@ -87,7 +87,7 @@ static int numeric_conver(char* _string, ObjectInfo* const numeric,const regex_t
 	}
 	ld = (lh*=c) + ld * c;
 
-	switch(numeric->typeInf->type[0]){
+	switch(numeric->typeInf->type){
 		case FLOAT: *(float*)(numeric->obj_addr)=ld; break;
 		case DOUBLE: *(double*)(numeric->obj_addr)=ld; break;
 		case LDOUBLE: *(long double*)(numeric->obj_addr)=ld;break;
@@ -129,24 +129,44 @@ static int boolean_conver(char* _string, ObjectInfo* const boolean,const regex_t
 static int array_conver(char* _string, ObjectInfo* const array,const regex_t *p_re){
 	++_string;
 	_string[strlen(_string)-1]='\0';
-	int m_size=1,err_no = 0,ii,i=0,ele_size=array->typeInf->size[0];
+
+	void* base_addr=array->obj_addr;
+	struct TYPE_INF it=*(array->typeInf->subObjInfo->typeInf);
+	ObjectInfo sot={
+			.typeInf=&it,
+			.obj_addr=base_addr
+	};
+	ObjectInfo ot={
+				.typeInf=&(struct TYPE_INF){
+					.type=array->typeInf->type,
+					.size={array->typeInf->size[0],array->typeInf->size[1]},
+					.subObjInfo=&sot
+				},
+				.obj_addr=base_addr
+	};
+
+	int m_size=1,err_no = 0,ii,i=0,ele_size=sot.typeInf->size[0];
+	size_t *cap_left=(size_t*)ot.typeInf->size+1;
 
 	regmatch_t match={0};
 	char tmp;
-	while(!(err_no = regexec(p_re+J_R_GET_ARRAY_ELEMENT, _string, m_size, &match, 0))&&array->typeInf->size[1]>0) {
+	while(!(err_no = regexec(p_re+J_R_GET_ARRAY_ELEMENT, _string, m_size, &match, 0))&&*cap_left>0) {
 		tmp=_string[match.rm_eo];
 		_string[match.rm_eo]='\0';
 
-		ii=convert(p_re,_string+match.rm_so,array);
-		if(ii>-1){
-			if(verify(_string+match.rm_so,p_re+J_R_ARRAY)){
-				array->obj_addr+=ele_size;
-				((enum E*)(array->typeInf->size))[1]--;
+		if (verify(_string + match.rm_so, p_re + J_R_ARRAY)) {
+			ii=convert(p_re,_string+match.rm_so,&sot);
+			if(ii>-1){
 				i++;
-			}else{
-				array->obj_addr+=ele_size*ii;
-				((enum E*)(array->typeInf->size))[1]-=ii;
+				sot.obj_addr = base_addr+i*ele_size;
+				(*cap_left)--;
+			}
+		} else {
+			ii=convert(p_re,_string+match.rm_so,&ot);
+			if(ii>-1){
 				i+=ii;
+				sot.obj_addr = base_addr+ ele_size * i;
+				(*cap_left)-=ii;
 			}
 		}
 
@@ -155,22 +175,22 @@ static int array_conver(char* _string, ObjectInfo* const array,const regex_t *p_
 		if ('\0' == (*(_string += match.rm_eo))) {
 			break;
 		}
-
 	}
-	array->obj_addr-=ele_size*i;
-	((enum E*)(array->typeInf->size))[1]+=i;
+//	array->obj_addr-=ele_size*i;
+//	((enum E*)(array->typeInf->size))[1]+=i;
 
 	_string[strlen(_string)]=']';
 	return i;
 }
 
 static int object_conver(char* _string, ObjectInfo* const object,const regex_t *p_re){
-	int m_size=3;
+	#define M_SIZE 3
 	ObjectInfo *o;
-	regmatch_t match[m_size];
+	regmatch_t match[M_SIZE];
+	long base_addr=(long)object->obj_addr;
 	int err_no = 0;
 	char tmp;
-	while (!(err_no = regexec(p_re+J_R_GET_KEY_VALUE, _string, m_size, match, 0))) {
+	while (!(err_no = regexec(p_re+J_R_GET_KEY_VALUE, _string, M_SIZE, match, 0))) {
 		tmp=_string[match[1].rm_eo];
 		_string[match[1].rm_eo]='\0';
 
@@ -180,7 +200,7 @@ static int object_conver(char* _string, ObjectInfo* const object,const regex_t *
 
 		if(o){
 			ObjectInfo obj=*o;
-			obj.obj_addr+=(long)object->obj_addr;				//base + offset == attribute address
+			obj.obj_addr+=base_addr;				//base + offset == attribute address
 
 			tmp=_string[match[2].rm_eo];
 			_string[match[2].rm_eo]='\0';
@@ -194,6 +214,7 @@ static int object_conver(char* _string, ObjectInfo* const object,const regex_t *
 		}
 	}
 	return 0;
+	#undef M_SIZE
 }
 
 static int (* const conver_by_type[5])(char* _string, ObjectInfo* const data,const regex_t *p_re)={
@@ -211,9 +232,8 @@ static int convert(const regex_t *p_re, char* _string, ObjectInfo* const objectI
 	if(i>J_R_BOOLEAN)
 		return -1;
 
-	if((i==ARRAY&&ARRAY==objectInfo->typeInf->type[1])
-			||(i==J_R_NUMBER&&objectInfo->typeInf->type[0]>=INT)
-			||(i!=0&&i==objectInfo->typeInf->type[0])){
+	if((i==J_R_NUMBER&&objectInfo->typeInf->type>=INT)
+			||(i!=0&&i==objectInfo->typeInf->type)){
 		return conver_by_type[i](_string,objectInfo,p_re);
 	}else
 		return -1;
@@ -287,8 +307,8 @@ static const char regx_grep_array_el[]=
 			"|true|false"
 			"|\"[^\"\\\\]*\""
 			"|\\{([^\\{\\}\"]|\"[^\\\\\"]*\")*\\}"
-			"|(\\{([^\\{\\}\"]|\"[^\\\\\"]*\")*){2}.*(\\}([^\\{\\}\"]|\"[^\\\\\"]*\")*){2}"
-			"|(\\{([^\{\\}\"]|\"[^\\\\\"]*\")*){3}.*(\\}([^\\{\\}\"]|\"[^\\\\\"]*\")*){3}"
+			"|(\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*){2}(([^\"\\{\\}]|\"[^\"\\\\]*\")*\\}){2}"
+			"|(\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*){3}(([^\"\\{\\}]|\"[^\"\\\\]*\")*\\}){3}"
 			"|\\[([A-Za-z0-9,:\\.\\+\\{\\}]|\\s|\\-|\"[^\\\\\"]*\")*\\]"
 			"|(\\[([A-Za-z0-9,:\\.\\+\\{\\}]|\\s|\\-|\"[^\\\\\"]*\")*){2}(\\]([A-Za-z0-9,:\\.\\+\\{\\}]|\\s|\\-|\"[^\\\\\"]*\")*){2}"
 			"|(\\[([A-Za-z0-9,:\\.\\+\\{\\}]|\\s|\\-|\"[^\\\\\"]*\")*){3}(\\]([A-Za-z0-9,:\\.\\+\\{\\}]|\\s|\\-|\"[^\\\\\"]*\")*){3}"
@@ -308,7 +328,7 @@ static const char regx_grep_object_attr[]=
 				"|(\\[([A-Za-z0-9,:\\.\\+\\{\\}]|\\s|\\-|\"[^\\\\\"]*\")*){3}(\\]([A-Za-z0-9,:\\.\\+\\{\\}]|\\s|\\-|\"[^\\\\\"]*\")*){3}"
 			")";
 
-static const char regx_test[]="^[A-Za-z0-9,:\\.\\+\\{\\}]|\\s|\\-+$";
+static const char regx_test[]="^(\\{([^\\{\\}\"]|\"[^\\\\\"]*\")*){3}(\\}([^\\{\\}\"]|\"[^\\\\\"]*\")*){3}$";
 static const char *pattern[]= {
 		regx_numeric,
 		regx_string,
