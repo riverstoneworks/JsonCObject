@@ -1,11 +1,8 @@
 /*
- ============================================================================
- Name        : Parse.c
- Author      : 
- Version     :
- Copyright   : Your copyright notice
- Description : Hello World in C, Ansi-style
- ============================================================================
+ * Parse.c
+ *
+ *  Created on: Jun 27, 2018
+ *      Author: Like.Z
  */
 
 #include <stdio.h>

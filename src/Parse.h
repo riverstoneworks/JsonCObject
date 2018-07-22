@@ -2,16 +2,16 @@
  * Parse.h
  *
  *  Created on: Jun 27, 2018
- *      Author: xpc
+ *      Author: Like.Z
  */
 
 #ifndef PARSE_H_
 #define PARSE_H_
 
-//typedef struct OBJECT_INFO ObjectInfo;
-struct OBJECT_INFO{
+typedef struct OBJECT_INF ObjectInfo;
+struct TYPE_INF{
 	const char* name;
-	enum E{
+	const enum E{
 		STRING=1,
 		ARRAY,
 		OBJECT,
@@ -25,20 +25,7 @@ struct OBJECT_INFO{
 		UINT=21,
 		ULONG,
 		ULLONG
-	}const type[2];
-	//size[0] is size of base type (int,float etc.) or length of string or element size in array;  size[1] is element number in array
-	size_t size[2];
-	//the *object int objectinfo array is the offset for attributes of STRUCT
-	struct OBJECT_INFO* const subObjInfo;
-	//base address for STRUCT type
-	void* obj_addr; // when it is used as offset address , the type is int.
-};
-
-//Improve
-typedef struct OBJECT_INF ObjectInfo;
-struct TYPE_INF{
-	const char* name;
-	const enum E  type;
+	}  type;
 	//size[0] is size of base type (int,float etc.) or length of string or element size in array;  size[1] is element number in array
 	const size_t size[2];
 	//the *object int objectinfo array is the offset for attributes of STRUCT
