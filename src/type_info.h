@@ -40,6 +40,20 @@ struct OBJECT_INF{
 	void * obj_addr; // when it is used as offset address , the type is int.
 };
 
+// init ObjectInfo
+#define O(na,type,offs){\
+			.name=#na,\
+			.typeInf=&T_INF_##type,\
+			.obj_addr=(void*)(offs)\
+		}
+//init TYPE_INF
+#define	T(na,ty,siz,...) {\
+		.name=#na,\
+		.type=ty,\
+		.size={sizeof(na),siz},\
+		.subObjInfo=(const ObjectInfo*)&(ObjectInfo[]){__VA_ARGS__}\
+}
+
 extern const struct TYPE_INF T_INF_INT;
 extern const struct TYPE_INF T_INF_UINT;
 extern const struct TYPE_INF T_INF_ULONG;
