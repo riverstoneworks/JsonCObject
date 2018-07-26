@@ -85,15 +85,15 @@ static int numeric_conver(char* _string, ObjectInfo* const numeric,const regex_t
 	ld = (lh*=c) + ld * c;
 
 	switch(numeric->typeInf->type){
-		case FLOAT: *(float*)(numeric->obj_addr)=ld; break;
-		case DOUBLE: *(double*)(numeric->obj_addr)=ld; break;
-		case LDOUBLE: *(long double*)(numeric->obj_addr)=ld;break;
-		case INT: *(int*)(numeric->obj_addr)=lh; break;
-		case UINT: *(unsigned int*)(numeric->obj_addr)=lh; break;
-		case LONG: *(long*)(numeric->obj_addr)=lh;  break;
-		case ULONG: *(unsigned long*)(numeric->obj_addr)=lh; break;
-		case LLONG: *(long long*)(numeric->obj_addr)=lh; break;
-		case ULLONG: *(unsigned long long*)(numeric->obj_addr)=lh; break;
+		case FLOAT: *(float*)(numeric->offset)=ld; break;
+		case DOUBLE: *(double*)(numeric->offset)=ld; break;
+		case LDOUBLE: *(long double*)(numeric->offset)=ld;break;
+		case INT: *(int*)(numeric->offset)=lh; break;
+		case UINT: *(unsigned int*)(numeric->offset)=lh; break;
+		case LONG: *(long*)(numeric->offset)=lh;  break;
+		case ULONG: *(unsigned long*)(numeric->offset)=lh; break;
+		case LLONG: *(long long*)(numeric->offset)=lh; break;
+		case ULLONG: *(unsigned long long*)(numeric->offset)=lh; break;
 		default:
 			return -1;
 	}
@@ -109,7 +109,7 @@ static int string_conver(char* _string, ObjectInfo* const string,const regex_t *
 	if((l=l>n?n:l)<0)
 		return -1;
 
-	strncpy((char*)(string->obj_addr),_string+1,l)[l]='\0';
+	strncpy((char*)(string->offset),_string+1,l)[l]='\0';
 
 	return 0;
 }
@@ -117,7 +117,7 @@ static int string_conver(char* _string, ObjectInfo* const string,const regex_t *
 // the format of _string is: true OR false
 static int boolean_conver(char* _string, ObjectInfo* const boolean,const regex_t *p_re){
 
-	*(char*)(boolean->obj_addr)=_string[0]=='t'?1:0;
+	*(char*)(boolean->offset)=_string[0]=='t'?1:0;
 
 	return 0;
 }
@@ -127,11 +127,11 @@ static int array_conver(char* _string, ObjectInfo* const array,const regex_t *p_
 	++_string;
 	_string[strlen(_string)-1]='\0';
 
-	void* base_addr=array->obj_addr;
+	void* base_addr=array->offset;
 	struct TYPE_INF it=*(array->typeInf->subObjInfo->typeInf);
 	ObjectInfo sot={
 			.typeInf=&it,
-			.obj_addr=base_addr
+			.offset=base_addr
 	};
 	ObjectInfo ot={
 				.typeInf=&(struct TYPE_INF){
@@ -139,7 +139,7 @@ static int array_conver(char* _string, ObjectInfo* const array,const regex_t *p_
 					.size={array->typeInf->size[0],array->typeInf->size[1]},
 					.subObjInfo=&sot
 				},
-				.obj_addr=base_addr
+				.offset=base_addr
 	};
 
 	int m_size=1,err_no = 0,ii,i=0,ele_size=sot.typeInf->size[0];
@@ -155,14 +155,14 @@ static int array_conver(char* _string, ObjectInfo* const array,const regex_t *p_
 			ii=convert(p_re,_string+match.rm_so,&sot);
 			if(ii>-1){
 				i++;
-				sot.obj_addr = base_addr+i*ele_size;
+				sot.offset = base_addr+i*ele_size;
 				(*cap_left)--;
 			}
 		} else {
 			ii=convert(p_re,_string+match.rm_so,&ot);
 			if(ii>-1){
 				i+=ii;
-				sot.obj_addr = base_addr+ ele_size * i;
+				sot.offset = base_addr+ ele_size * i;
 				(*cap_left)-=ii;
 			}
 		}
@@ -173,7 +173,7 @@ static int array_conver(char* _string, ObjectInfo* const array,const regex_t *p_
 			break;
 		}
 	}
-//	array->obj_addr-=ele_size*i;
+//	array->offset-=ele_size*i;
 //	((enum E*)(array->typeInf->size))[1]+=i;
 
 	_string[strlen(_string)]=']';
@@ -184,7 +184,7 @@ static int object_conver(char* _string, ObjectInfo* const object,const regex_t *
 	#define M_SIZE 3
 	ObjectInfo *o;
 	regmatch_t match[M_SIZE];
-	long base_addr=(long)object->obj_addr;
+	long base_addr=(long)object->offset;
 	int err_no = 0;
 	char tmp;
 	while (!(err_no = regexec(p_re+J_R_GET_KEY_VALUE, _string, M_SIZE, match, 0))) {
@@ -197,7 +197,7 @@ static int object_conver(char* _string, ObjectInfo* const object,const regex_t *
 
 		if(o){
 			ObjectInfo obj=*o;
-			obj.obj_addr+=base_addr;				//base + offset == attribute address
+			obj.offset+=base_addr;				//base + offset == attribute address
 
 			tmp=_string[match[2].rm_eo];
 			_string[match[2].rm_eo]='\0';

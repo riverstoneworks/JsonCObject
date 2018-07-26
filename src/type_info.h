@@ -37,14 +37,14 @@ struct OBJECT_INF{
 	const char* const name;
 	const struct TYPE_INF* typeInf;
 	//base address for STRUCT type
-	void * obj_addr; // when it is used as offset address , the type is int.
+	void * offset; // when it is used as offset address , the type is int.
 };
 
 // init ObjectInfo
 #define O(na,type,offs){\
 			.name=#na,\
 			.typeInf=&T_INF_##type,\
-			.obj_addr=(void*)(offs)\
+			.offset=(void*)(offs)\
 		}
 //init TYPE_INF
 #define	T(na,ty,siz,...) {\
