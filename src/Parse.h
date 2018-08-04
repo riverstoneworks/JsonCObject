@@ -10,10 +10,10 @@
 #include "type_info.h"
 
 
-int json_convert_init();
-int json_convert_to_obj(char* , ObjectInfo*);
-int json_convert_from_obj(char* , ObjectInfo*);
-int json_convert_destroy();
+extern int json_cto_struct_init();
+extern int json_cto_struct(char* , ObjectInfo*);
+extern int json_convert_from_struct(char* , ObjectInfo*);
+extern int json_cto_struct_destroy();
 
-int verify_test(int i,char* s);
+extern int verify_test(int i,char* s);
 #endif /* PARSE_H_ */
