@@ -17,6 +17,7 @@ typedef struct TYPE_INF{
 		ARRAY,
 		OBJECT,
 		BOOLEAN,
+		CHAR,
 		INT = 11,
 		LONG,
 		LLONG,
@@ -25,7 +26,8 @@ typedef struct TYPE_INF{
 		LDOUBLE,
 		UINT = 21,
 		ULONG,
-		ULLONG
+		ULLONG,
+		PTR
 	}type;
 	//size[0] is size of base type (int,float etc.) or length of string or element size in array;  size[1] is element number in array
 	const size_t size[2];
@@ -68,6 +70,10 @@ struct OBJECT_INF{
 #define T_STRING(length)\
 		TG(char##length,STRING,sizeof(char)*length,length)
 
+#define	T_PTR(na,...) \
+		TG(na,PTR,sizeof(char*),__VA_ARGS__)
+
+
 //base type info
 extern const TypeInf T_INF_INT;
 extern const TypeInf T_INF_UINT;
@@ -79,5 +85,6 @@ extern const TypeInf T_INF_FLOAT;
 extern const TypeInf T_INF_DOUBLE;;
 extern const TypeInf T_INF_LDOUBLE;
 extern const TypeInf T_INF_BOOLEAN;
+extern const TypeInf T_INF_P_;
 
 #endif /* TYPE_INFO_H_ */

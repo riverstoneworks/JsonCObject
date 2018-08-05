@@ -10,16 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Parse.h"
-
-enum{
-	J_R_NUMBER=0,
-	J_R_STRING,
-	J_R_ARRAY,
-	J_R_OBJECT,
-	J_R_BOOLEAN,
-	J_R_GET_ARRAY_ELEMENT,
-	J_R_GET_KEY_VALUE,
-};
+#include "Parse_type.h"
 
 static int convert(char* ,size_t *, ObjectInfo* const );
 
@@ -28,23 +19,23 @@ static int numeric_conver(char* _string,size_t * str_len, ObjectInfo* const nume
 	int n;
 	switch(numeric->typeInf->type){
 		case FLOAT:
-			sprintf(s,"%G%n",*(float*)(numeric->offset),&n); break;
+			n=sprintf(s,"%G",*(float*)(numeric->offset)); break;
 		case DOUBLE:
-			sprintf(s,"%lG%n",*(double*)(numeric->offset),&n); break;
+			n=sprintf(s,"%lG",*(double*)(numeric->offset)); break;
 		case LDOUBLE:
-			sprintf(s,"%.16LG%n",*(long double*)(numeric->offset),&n);break;
+			n=sprintf(s,"%.16LG",*(long double*)(numeric->offset));break;
 		case INT:
-			sprintf(s,"%d%n",*(int*)(numeric->offset),&n); break;
+			n=sprintf(s,"%d",*(int*)(numeric->offset)); break;
 		case UINT:
-			sprintf(s,"%u%n",*(unsigned int*)(numeric->offset),&n); break;
+			n=sprintf(s,"%u",*(unsigned int*)(numeric->offset)); break;
 		case LONG:
-			sprintf(s,"%ld%n",*(long*)(numeric->offset),&n);  break;
+			n=sprintf(s,"%ld",*(long*)(numeric->offset));  break;
 		case ULONG:
-			sprintf(s,"%ld%n",*(unsigned long*)(numeric->offset),&n); break;
+			n=sprintf(s,"%ld",*(unsigned long*)(numeric->offset)); break;
 		case LLONG:
-			sprintf(s,"%lld%n",*(long long*)(numeric->offset),&n); break;
+			n=sprintf(s,"%lld",*(long long*)(numeric->offset)); break;
 		case ULLONG:
-			sprintf(s,"%lld%n",*(unsigned long long*)(numeric->offset),&n); break;
+			n=sprintf(s,"%lld",*(unsigned long long*)(numeric->offset)); break;
 		default:
 			return -1;
 	}
@@ -83,7 +74,7 @@ static int string_conver(char* _string, size_t* str_len, ObjectInfo* const strin
 static int boolean_conver(char* _string,size_t* str_len, ObjectInfo* const boolean){
 
 	int i=0;
-	char* s=*(char*)(boolean->offset)?*str_len>3&&(i=3)?"true":NULL:*str_len>4&&(i=4)?"false":NULL;
+	char* s=*(unsigned char*)(boolean->offset)?*str_len>3&&(i=3)?"true":NULL:*str_len>4&&(i=4)?"false":NULL;
 
 	if(!s)
 		return -1;
@@ -92,6 +83,11 @@ static int boolean_conver(char* _string,size_t* str_len, ObjectInfo* const boole
 	*str_len-=i;
 	_string+=i;
 	return 0;
+}
+
+//
+static int char_conver(char* _string,size_t* str_len, ObjectInfo* const _char){
+	return *str_len>2?(*_string++='"')&&(*_string++=*(char*)(_char->offset))&&(*_string++='"')&&(*str_len-=3)&&0:-1;
 }
 
 // array[array_size, ele_size, poiter_to_array]
@@ -176,6 +172,17 @@ static int object_conver(char* _string,size_t * str_len, ObjectInfo* const objec
 	return 0;
 }
 
+static int p_object_conver(char* _string,size_t * str_len, ObjectInfo* const object){
+	void** p=(void**)object->offset;
+	if(!*p)
+		return *str_len>3?strncpy(_string,"null",4)&&(_string+=4)&&(*str_len-=4)&&0:-1;
+	else{
+		ObjectInfo o=*object->typeInf->subObjInfo;
+		o.offset=*p;
+		return object_conver(_string,str_len, &o);
+	}
+}
+
 static int (* const conver_by_type[5])(char* _string,size_t* str_len, ObjectInfo* const data)={
 		numeric_conver,
 		string_conver,
@@ -186,16 +193,26 @@ static int (* const conver_by_type[5])(char* _string,size_t* str_len, ObjectInfo
 
 static int convert(char* _string,size_t * str_len, ObjectInfo* const objectInfo){
 
-	int i=J_R_STRING;
-	if(objectInfo->typeInf->type>=INT)
-		i=J_R_NUMBER;
-	else
-		while(i<=J_R_BOOLEAN&&objectInfo->typeInf->type==i) ++i;
+	int t=objectInfo->typeInf->type;
 
-	if(i>J_R_BOOLEAN)
-		return -1;
-	else
-		return conver_by_type[i](_string,str_len,objectInfo);
+	if(t==CHAR)
+		return char_conver(_string,str_len,objectInfo);
+	else if(t==PTR&&objectInfo->typeInf->subObjInfo->typeInf->type==OBJECT)
+		return p_object_conver(_string,str_len,objectInfo);
+	else{
+		int i=J_R_STRING;
+
+		if(t>=INT&&t<=ULLONG)
+			i=J_R_NUMBER;
+		else
+			while(i<=J_R_BOOLEAN&&objectInfo->typeInf->type==i) ++i;
+
+		if(i>J_R_BOOLEAN)
+			return -1;
+		else
+			return conver_by_type[i](_string,str_len,objectInfo);
+	}
+
 }
 
 

@@ -72,7 +72,13 @@ const TypeInf T_INF_LDOUBLE={
 const TypeInf T_INF_BOOLEAN={
 		.name="boolean",
 		.type=BOOLEAN,
-		.size={sizeof(char)},
+		.size={sizeof(unsigned char)},
 		.subObjInfo=(void*)(0)
 };
 
+const TypeInf T_INF_CHAR={
+		.name="char",
+		.type=CHAR,
+		.size={sizeof(char)},
+		.subObjInfo=(void*)(0)
+};

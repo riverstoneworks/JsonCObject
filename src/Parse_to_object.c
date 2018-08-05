@@ -10,16 +10,7 @@
 #include <regex.h>
 #include <string.h>
 #include "Parse.h"
-
-enum{
-	J_R_NUMBER=0,
-	J_R_STRING,
-	J_R_ARRAY,
-	J_R_OBJECT,
-	J_R_BOOLEAN,
-	J_R_GET_ARRAY_ELEMENT,
-	J_R_GET_KEY_VALUE,
-};
+#include "Parse_type.h"
 
 static int convert(const regex_t*,char* , ObjectInfo* const );
 
@@ -117,9 +108,16 @@ static int string_conver(char* _string, ObjectInfo* const string,const regex_t *
 // the format of _string is: true OR false
 static int boolean_conver(char* _string, ObjectInfo* const boolean,const regex_t *p_re){
 
-	*(char*)(boolean->offset)=_string[0]=='t'?1:0;
+	*(unsigned char*)(boolean->offset)=(_string[0]=='t'?1:0);
 
 	return 0;
+}
+
+// the format of _string is: "c"
+static int char_conver(char* _string, ObjectInfo* const _char,const regex_t *p_re){
+
+	return strlen(_string)==3?(*(char*)(_char->offset)=_string[1])&&0:-1;
+
 }
 
 // array[array_size, ele_size, poiter_to_array]
@@ -202,7 +200,30 @@ static int object_conver(char* _string, ObjectInfo* const object,const regex_t *
 	#undef M_SIZE
 }
 
-static int (* const conver_by_type[5])(char* _string, ObjectInfo* const data,const regex_t *p_re)={
+// the memory which pointed by object->offset is only accessed with this pointer
+static int p_object_conver(char* _string, ObjectInfo* const object,const regex_t *p_re){
+	void**p=(void**)object->offset;
+	if(!p)
+		return -1;
+	if(!*p){
+		*p=malloc(object->typeInf->size[0]);
+	}
+	ObjectInfo o=*object->typeInf->subObjInfo;
+	o.offset=*p;
+	object_conver(_string, &o,p_re);
+	return 0;
+}
+
+// the memory which pointed by object->offset is only accessed with this pointer
+static inline int null_conver(char* _string, ObjectInfo* const object,const regex_t *p_re){
+	void**p=(void**)object->offset;
+	if(*p){
+		free(*p);
+		*p=NULL;
+	}
+	return 0;
+}
+static int (* const conver_by_type[6])(char* _string, ObjectInfo* const data,const regex_t *p_re)={
 		numeric_conver,
 		string_conver,
 		array_conver,
@@ -212,15 +233,26 @@ static int (* const conver_by_type[5])(char* _string, ObjectInfo* const data,con
 
 static int convert(const regex_t *p_re, char* _string, ObjectInfo* const objectInfo){
 
-	int i=J_R_NUMBER;
-	while(i<=J_R_BOOLEAN&&verify(_string,p_re+i)) ++i;
-	if(i>J_R_BOOLEAN)
-		return -1;
+	int t=objectInfo->typeInf->type;
 
-	if((i==J_R_NUMBER&&objectInfo->typeInf->type>=INT)
-			||(i!=0&&i==objectInfo->typeInf->type)){
+	int i=J_R_NUMBER;
+	while(i<=J_R_NULL&&verify(_string,p_re+i)) ++i;
+
+	if(i>J_R_NULL)
+		return -1;
+	else if(i==J_R_NULL){
+		if(t==PTR&&objectInfo->typeInf->subObjInfo->typeInf->type==OBJECT)
+			return null_conver(_string,objectInfo,p_re);
+		else
+			return -1;
+	}else if((i==J_R_NUMBER&&t>=INT&&t<=ULLONG)
+			||(i!=0&&i==t)){
 		return conver_by_type[i](_string,objectInfo,p_re);
-	}else
+	}else if(i==J_R_STRING&&t==CHAR)
+		return char_conver(_string,objectInfo,p_re);
+	else if(i==J_R_OBJECT&&t==PTR&&objectInfo->typeInf->subObjInfo->typeInf->type==OBJECT)
+		return p_object_conver(_string,objectInfo,p_re);
+	else
 		return -1;
 
 }
@@ -229,13 +261,14 @@ static int convert(const regex_t *p_re, char* _string, ObjectInfo* const objectI
 static const char regx_numeric[]= "^(\\-|\\+)?[0-9]+(\\.[0-9]+)?$";
 static const char regx_string[]= "^\"[^\"\\]*\"$";
 static const char regx_boolean[]= "^true|false$";
+static const char regx_null[]= "^null$";
 
 static const char regx_array[]=
 		"^\\[\\s*"
 			"("
 				"("
 					"(\\-|\\+)?[0-9]+(\\.[0-9]+)?"
-					"|true|false"
+					"|true|false|null"
 					"|\"[^\\\\\"]*\""
 					"|\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
 						"("
@@ -272,7 +305,7 @@ static const char regx_array[]=
 				")\\s*,\\s*"
 			")*("
 					"(\\-|\\+)?[0-9]+(\\.[0-9]+)?"
-					"|true|false"
+					"|true|false|null"
 					"|\"[^\\\\\"]*\""
 					"|\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
 						"("
@@ -316,7 +349,7 @@ static const char regx_object[]=
 				"\\s*("
 						"(\\-|\\+)?[0-9]+(\\.[0-9]+)?"
 						"|\"[^\"\\\\]*\""
-						"|true|false"
+						"|true|false|null"
 						"|\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
 							"("
 								"\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
@@ -354,7 +387,7 @@ static const char regx_object[]=
 				"\\s*("
 						"(\\-|\\+)?[0-9]+(\\.[0-9]+)?"
 						"|\"[^\"\\\\]*\""
-						"|true|false"
+						"|true|false|null"
 						"|\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
 							"("
 								"\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
@@ -393,7 +426,7 @@ static const char regx_object[]=
 static const char regx_grep_array_el[]=
 		"("
 			"(\\-|\\+)?[0-9]+(\\.[0-9]+)?"
-			"|true|false"
+			"|true|false|null"
 			"|\"[^\"\\\\]*\""
 			"|\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
 				"("
@@ -434,7 +467,7 @@ static const char regx_grep_object_attr[]=
 		":\\s*("
 				"(\\-|\\+)?[0-9]+(\\.[0-9]+)?"
 				"|\"[^\"\\\\]*\""
-				"|true|false"
+				"|true|false|null"
 				"|\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
 					"("
 						"\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
@@ -477,11 +510,13 @@ static const char *pattern[]= {
 		regx_array,
 		regx_object,
 		regx_boolean,
+		regx_null,
 		regx_grep_array_el,
 		regx_grep_object_attr,
 		regx_test
 };
 static const int flag[]={
+		REG_EXTENDED|REG_NOSUB,
 		REG_EXTENDED|REG_NOSUB,
 		REG_EXTENDED|REG_NOSUB,
 		REG_EXTENDED|REG_NOSUB,
@@ -498,7 +533,7 @@ int json_cto_struct_init(){
 		return -1;
 
 	int erro_no;
-	reg_p=initRegex(8,pattern,flag,&erro_no);
+	reg_p=initRegex(9,pattern,flag,&erro_no);
 
 	return erro_no;
 }
