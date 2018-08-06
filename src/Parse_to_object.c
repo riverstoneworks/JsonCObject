@@ -258,7 +258,7 @@ static int convert(const regex_t *p_re, char* _string, ObjectInfo* const objectI
 }
 
 
-static const char regx_numeric[]= "^(\\-|\\+)?[0-9]+(\\.[0-9]+)?$";
+static const char regx_numeric[]= "^(\\-)?([1-9][0-9]*|0)(\\.[0-9]+)?((e|E)(\\-|\\+)?[0-9]+)?$";
 static const char regx_string[]= "^\"[^\"\\]*\"$";
 static const char regx_boolean[]= "^true|false$";
 static const char regx_null[]= "^null$";
@@ -267,7 +267,7 @@ static const char regx_array[]=
 		"^\\[\\s*"
 			"("
 				"("
-					"(\\-|\\+)?[0-9]+(\\.[0-9]+)?"
+					"(\\-)?([1-9][0-9]*|0)(\\.[0-9]+)?((e|E)(\\-|\\+)?[0-9]+)?"
 					"|true|false|null"
 					"|\"[^\\\\\"]*\""
 					"|\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
@@ -304,7 +304,7 @@ static const char regx_array[]=
 					"\\]"
 				")\\s*,\\s*"
 			")*("
-					"(\\-|\\+)?[0-9]+(\\.[0-9]+)?"
+					"(\\-)?([1-9][0-9]*|0)(\\.[0-9]+)?((e|E)(\\-|\\+)?[0-9]+)?"
 					"|true|false|null"
 					"|\"[^\\\\\"]*\""
 					"|\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
@@ -347,7 +347,7 @@ static const char regx_object[]=
 			"("
 				"(\"[^\"\\\\]+\")\\s*:"
 				"\\s*("
-						"(\\-|\\+)?[0-9]+(\\.[0-9]+)?"
+						"(\\-)?([1-9][0-9]*|0)(\\.[0-9]+)?((e|E)(\\-|\\+)?[0-9]+)?"
 						"|\"[^\"\\\\]*\""
 						"|true|false|null"
 						"|\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
@@ -385,7 +385,7 @@ static const char regx_object[]=
 					")\\s*,\\s*"
 				")*(\"[^\"\\\\]+\")\\s*:"
 				"\\s*("
-						"(\\-|\\+)?[0-9]+(\\.[0-9]+)?"
+						"(\\-)?([1-9][0-9]*|0)(\\.[0-9]+)?((e|E)(\\-|\\+)?[0-9]+)?"
 						"|\"[^\"\\\\]*\""
 						"|true|false|null"
 						"|\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
@@ -425,7 +425,7 @@ static const char regx_object[]=
 
 static const char regx_grep_array_el[]=
 		"("
-			"(\\-|\\+)?[0-9]+(\\.[0-9]+)?"
+			"(\\-)?([1-9][0-9]*|0)(\\.[0-9]+)?((e|E)(\\-|\\+)?[0-9]+)?"
 			"|true|false|null"
 			"|\"[^\"\\\\]*\""
 			"|\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
@@ -465,7 +465,7 @@ static const char regx_grep_array_el[]=
 static const char regx_grep_object_attr[]=
 		"\"([^\"\\\\]+)\"\\s*"
 		":\\s*("
-				"(\\-|\\+)?[0-9]+(\\.[0-9]+)?"
+				"(\\-)?([1-9][0-9]*|0)(\\.[0-9]+)?((e|E)(\\-|\\+)?[0-9]+)?"
 				"|\"[^\"\\\\]*\""
 				"|true|false|null"
 				"|\\{([^\"\\{\\}]|\"[^\"\\\\]*\")*"
@@ -502,7 +502,7 @@ static const char regx_grep_object_attr[]=
 				"\\]"
 			")";
 
-static const char regx_test[]="";
+static const char regx_test[]="^(\\-)?([1-9][0-9]*|0)(\\.[0-9]+)?((e|E)(\\-|\\+)?[0-9]+)?$";
 
 static const char *pattern[]= {
 		regx_numeric,
