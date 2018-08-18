@@ -19,7 +19,7 @@
 
 extern int json_cto_struct_init();
 extern int json_cto_struct(char* , ObjectInfo*);
-extern int json_convert_from_struct(char* , ObjectInfo*);
+extern int json_cf_struct(char* ,size_t , ObjectInfo*);
 extern int json_cto_struct_destroy();
 
 extern int verify_test(int i,char* s);
