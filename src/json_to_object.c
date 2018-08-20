@@ -57,26 +57,6 @@ static inline regex_t * initRegex(const size_t num,const char *pattern[],const i
 
 
 static int numeric_conver(char* _string, ObjectInfo* const numeric,const regex_t *p_re){
-//	int c=1,i=0;
-//	long long lh=0;
-//	long double ld=(long double)0.0;
-//
-//	if(*_string=='-'){
-//		if(numeric->typeInf->type>=UINT)	return -1;
-//		++_string;
-//		c=-1;
-//	}else if(*_string=='+'){
-//		++_string;
-//	}
-//
-//	while((*_string)!='\0'&&(*_string)!='.')	lh=(*_string++)-48+(lh*10);
-//
-//	if (*_string == '.'&&(i=strlen(_string))>1) {
-//		while((--i)>0)
-//			ld=(_string[i]-48+ld)/10;
-//	}
-//	ld = (lh*=c) + ld * c;
-
 	char * p;
 	switch(numeric->typeInf->type){
 		case FLOAT: *(float*)(numeric->offset)=strtof(_string,&p); break;
@@ -240,16 +220,16 @@ static int object_conver(char* _string, ObjectInfo* const object,const regex_t *
 }
 
 // the memory which pointed by object->offset is only accessed with this pointer
-static int p_object_conver(char* _string, ObjectInfo* const object,const regex_t *p_re){
-	void**p=(void**)object->offset;
+static int ptr_conver(char* _string, ObjectInfo* const ptr,const regex_t *p_re){
+	void**p=(void**)ptr->offset;
 	if(!p)
 		return -1;
 	if(!*p){
-		*p=malloc(object->typeInf->size[0]);
+		*p=malloc(ptr->typeInf->subObjInfo->typeInf->size[0]);
 	}
-	ObjectInfo o=*object->typeInf->subObjInfo;
+	ObjectInfo o=*ptr->typeInf->subObjInfo;
 	o.offset=*p;
-	object_conver(_string, &o,p_re);
+	convert(p_re,_string, &o);
 	return 0;
 }
 
@@ -290,7 +270,7 @@ static int convert(const regex_t *p_re, char* _string, ObjectInfo* const objectI
 	}else if(i==J_R_STRING&&t==CHAR)
 		return char_conver(_string,objectInfo,p_re);
 	else if(i==J_R_OBJECT&&t==PTR&&objectInfo->typeInf->subObjInfo->typeInf->type==OBJECT)
-		return p_object_conver(_string,objectInfo,p_re);
+		return ptr_conver(_string,objectInfo,p_re);
 	else
 		return -1;
 

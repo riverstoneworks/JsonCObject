@@ -71,7 +71,8 @@ struct OBJECT_INF{
 		TG(char##length,STRING,sizeof(char)*length,length)
 
 #define	T_PTR(na,...) \
-		TG(na,PTR,sizeof(char*),__VA_ARGS__)
+		TG(na,PTR,sizeof(char*),1,\
+				__VA_ARGS__)
 
 
 //base type info

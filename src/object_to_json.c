@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "Parse.h"
 #include "Parse_type.h"
 
@@ -39,8 +40,10 @@ static int numeric_conver(char** const  _string,size_t * str_len, ObjectInfo* co
 		default:
 			return -1;
 	}
-	if(n>*str_len)
+	if(n<0||n>*str_len){
+		puts(strerror(errno));
 		return -1;
+	}
 	strncpy(*_string,s,n);
 	*_string+=n;
 	*str_len-=n;
@@ -171,14 +174,14 @@ static int object_conver(char** const _string,size_t * str_len, ObjectInfo* cons
 	return 0;
 }
 
-static int p_object_conver(char** const _string,size_t * str_len, ObjectInfo* const object){
+static int ptr_conver(char** const _string,size_t * str_len, ObjectInfo* const object){
 	void** p=(void**)object->offset;
 	if(!*p)
 		return *str_len>3?strncpy(*_string,"null",4)&&(*_string+=4)&&(*str_len-=4)&&0:-1;
 	else{
 		ObjectInfo o=*object->typeInf->subObjInfo;
 		o.offset=*p;
-		return object_conver(_string,str_len, &o);
+		return convert(_string,str_len, &o);
 	}
 }
 
@@ -197,7 +200,7 @@ static int convert(char** const _string,size_t * str_len, ObjectInfo* const obje
 	if(t==CHAR)
 		return char_conver(_string,str_len,objectInfo);
 	else if(t==PTR&&objectInfo->typeInf->subObjInfo->typeInf->type==OBJECT)
-		return p_object_conver(_string,str_len,objectInfo);
+		return ptr_conver(_string,str_len,objectInfo);
 	else{
 		int i=J_R_STRING;
 
@@ -215,7 +218,12 @@ static int convert(char** const _string,size_t * str_len, ObjectInfo* const obje
 }
 
 
-int json_cf_struct(char* string,size_t str_len, ObjectInfo* objectInfo){
+int json_cf_object(char* string,size_t str_len, ObjectInfo* objectInfo){
 
-	return convert(&string,&str_len,objectInfo);
+	if(--str_len>1&&0>convert(&string,&str_len,objectInfo))
+		return -1;
+	else{
+		*string='\0';
+		return 0;
+	}
 }
