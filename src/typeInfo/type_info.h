@@ -86,6 +86,5 @@ extern const TypeInf T_INF_FLOAT;
 extern const TypeInf T_INF_DOUBLE;;
 extern const TypeInf T_INF_LDOUBLE;
 extern const TypeInf T_INF_BOOLEAN;
-extern const TypeInf T_INF_P_;
 
 #endif /* TYPE_INFO_H_ */

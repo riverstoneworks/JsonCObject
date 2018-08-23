@@ -4,7 +4,7 @@
  *  Created on: Jul 24, 2018
  *      Author: Like.Z
  */
-#include "type_info.h"
+#include "../typeInfo/type_info.h"
 
 const TypeInf T_INF_INT={
 		.name="int",

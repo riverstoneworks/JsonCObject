@@ -11,8 +11,9 @@
 #include <string.h>
 #include <uchar.h>
 #include <errno.h>
-#include "Parse.h"
-#include "Parse_type.h"
+
+#include "json_type.h"
+#include "jsonCObject.h"
 
 static int convert(const regex_t*,char* , ObjectInfo* const );
 
@@ -547,7 +548,7 @@ static const int flag[]={
 };
 static regex_t* reg_p=NULL;
 
-int json_cto_struct_init(){
+int json_cto_object_init(){
 	if(reg_p!=NULL)
 		return -1;
 
@@ -557,7 +558,7 @@ int json_cto_struct_init(){
 	return erro_no;
 }
 
-int json_cto_struct_destroy(){
+int json_cto_object_destroy(){
 	if(reg_p!=NULL){
 		freeRegex(1,reg_p);
 		return 0;
@@ -565,7 +566,7 @@ int json_cto_struct_destroy(){
 		return -1;
 }
 
-int json_cto_struct(char* string, ObjectInfo* objectInfo){
+int json_cto_object(char* string, ObjectInfo* objectInfo){
 	return convert(reg_p,string,objectInfo);
 }
 

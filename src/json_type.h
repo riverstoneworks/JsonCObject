@@ -5,8 +5,8 @@
  *      Author: xpc
  */
 
-#ifndef PARSE_TYPE_H_
-#define PARSE_TYPE_H_
+#ifndef JSON_TYPE_H_
+#define JSON_TYPE_H_
 
 enum{
 	J_R_NUMBER=0,
@@ -16,7 +16,7 @@ enum{
 	J_R_BOOLEAN,
 	J_R_NULL,
 	J_R_GET_ARRAY_ELEMENT,
-	J_R_GET_KEY_VALUE,
+	J_R_GET_KEY_VALUE
 };
 
-#endif /* PARSE_TYPE_H_ */
+#endif /* JSON_TYPE_H_ */

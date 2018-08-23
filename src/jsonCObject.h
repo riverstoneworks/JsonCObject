@@ -5,9 +5,9 @@
  *      Author: Like.Z
  */
 
-#ifndef PARSE_H_
-#define PARSE_H_
-#include "type_info.h"
+#ifndef JSONCOBJECT_H_
+#define JSONCOBJECT_H_
+#include "typeInfo/type_info.h"
 /*
  * Before this, set locate LC_CTYPE "*.UTF-8" for Unicode char transform between utf-8 and utf-16.
  * e.g. UTF-16 char "\u040f" in JSON string
@@ -17,10 +17,10 @@
 			setlocale(LC_CTYPE, "en_US.UTF-8");
  * */
 
-extern int json_cto_struct_init();
-extern int json_cto_struct(char* , ObjectInfo*);
+extern int json_cto_object_init();
+extern int json_cto_object(char* , ObjectInfo*);
 extern int json_cf_object(char* ,size_t , ObjectInfo*);
-extern int json_cto_struct_destroy();
+extern int json_cto_object_destroy();
 
 extern int verify_test(int i,char* s);
-#endif /* PARSE_H_ */
+#endif /* JSONCOBJECT_H_ */

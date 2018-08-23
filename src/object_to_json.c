@@ -10,8 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "Parse.h"
-#include "Parse_type.h"
+
+#include "json_type.h"
+#include "jsonCObject.h"
 
 static int convert(char** const ,size_t *, ObjectInfo* const );
 
