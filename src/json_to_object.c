@@ -567,7 +567,7 @@ int json_cto_object_destroy(){
 }
 
 int json_cto_object(char* string, ObjectInfo* objectInfo){
-	return convert(reg_p,string,objectInfo);
+	return convert(reg_p,string,objectInfo)>-1?0:-1;
 }
 
 int verify_test(int i,char* s){
