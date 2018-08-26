@@ -5,16 +5,15 @@
  *      Author: Like.Z(sxpc722@aliyun.com)
  */
 
-#ifndef TC_FUNCTION_H_
-#define TC_FUNCTION_H_
-
-extern void tc_json_cto_obj(void);
-extern void tc_json_cf_obj(void);
-extern void tc_json_cto_obj_array(void);
-extern void tc_json_cf_obj_array(void);
+#ifndef TC_SUITE_FT_H_
+#define TC_SUITE_FT_H_
+#include "../test.h"
+extern const struct TC_IND ti_single_object;
+extern const struct TC_IND ti_object_array;
+extern const struct TC_IND* tc_ind_fc[2];
 
 extern int init_suite_FT(void);
 
 extern int clean_suite_FT(void);
 
-#endif /* TC_FUNCTION_H_ */
+#endif /* TC_SUITE_FT_H_ */

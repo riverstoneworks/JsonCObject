@@ -87,3 +87,11 @@ void tc_json_cf_obj(void){
 		CU_ASSERT(0==strcmp(json_str,result));
 	}
 }
+
+const struct TC_IND ti_single_object={
+		.tc_num=2,
+		.caseMap={
+			{"TC Json_to_Object",tc_json_cto_obj},
+			{"TC Object_to_Json",tc_json_cf_obj}
+		}
+};

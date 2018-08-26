@@ -28,7 +28,7 @@
 #include <CUnit/Basic.h>
 
 #include "FT/tc_suite_FT.h"
-
+#include "UT/tc_suite_UT.h"
 
 /* The main() function for setting up and running the tests.
  * Returns a CUE_SUCCESS on successful running, another
@@ -36,13 +36,14 @@
  */
 int main()
 {
+	int n;
 	CU_pSuite pSuite;
    /* initialize the CUnit test registry */
    if (CUE_SUCCESS != CU_initialize_registry())
       return CU_get_error();
 
    /* add a suite to the registry */
-   pSuite = CU_add_suite("Suite_FT_single", init_suite_FT, clean_suite_FT);
+   pSuite = CU_add_suite("Suite_FT", init_suite_FT, clean_suite_FT);
    if (NULL == pSuite) {
       CU_cleanup_registry();
       return CU_get_error();
@@ -50,19 +51,39 @@ int main()
 
    /* add the tests to the suite */
    /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
-   if ((NULL == CU_add_test(pSuite, "TC Json_to_Object", tc_json_cto_obj))||
-       (NULL == CU_add_test(pSuite, "TC Object_to_Json", tc_json_cf_obj))||
-	   (NULL == CU_add_test(pSuite, "TC Json_to_Object_array", tc_json_cto_obj_array))||
-	   (NULL == CU_add_test(pSuite, "TC Object_to_Json_array", tc_json_cf_obj_array)))
-   {
+   n=sizeof(tc_ind_fc)/sizeof(struct TC_IND*);
+   for(int i=0;i<n;++i)
+	   for(int j=0;j<tc_ind_fc[i]->tc_num; ++j)
+		   if (NULL == CU_add_test(pSuite, (char*)tc_ind_fc[i]->caseMap[j][0], (void(*)(void))tc_ind_fc[i]->caseMap[j][1]))
+		   {
+			  CU_cleanup_registry();
+			  return CU_get_error();
+		   }
+
+
+   pSuite = CU_add_suite("Suite_UT", init_suite_UT, clean_suite_UT);
+   if (NULL == pSuite) {
       CU_cleanup_registry();
       return CU_get_error();
    }
 
+
+   /* add the tests to the suite */
+   /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
+   n=sizeof(tc_ind_uc)/sizeof(struct TC_IND*);
+   for(int i=0;i<n;++i)
+	   for(int j=0;j<tc_ind_uc[i]->tc_num; ++j)
+		   if (NULL == CU_add_test(pSuite, (char*)tc_ind_uc[i]->caseMap[j][0], (void(*)(void))tc_ind_uc[i]->caseMap[j][1]))
+		   {
+			  CU_cleanup_registry();
+			  return CU_get_error();
+		   }
+
+
    /* Run all tests using the CUnit Basic interface */
    CU_basic_set_mode(CU_BRM_VERBOSE);
    CU_basic_run_tests();
-   CU_basic_show_failures(CU_get_failure_list());
+
    CU_cleanup_registry();
    return CU_get_error();
 }

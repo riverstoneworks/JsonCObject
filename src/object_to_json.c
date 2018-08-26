@@ -26,6 +26,10 @@ static int numeric_conver(char** const  _string,size_t * str_len, ObjectInfo* co
 			n=sprintf(s,"%lG",*(double*)(numeric->offset)); break;
 		case LDOUBLE:
 			n=sprintf(s,"%.16LG",*(long double*)(numeric->offset));break;
+		case CHAR:
+			n=sprintf(s,"%d",*(char*)(numeric->offset)); break;
+		case UCHAR:
+			n=sprintf(s,"%d",*(unsigned char*)(numeric->offset)); break;
 		case INT:
 			n=sprintf(s,"%d",*(int*)(numeric->offset)); break;
 		case UINT:
@@ -198,14 +202,14 @@ static int convert(char** const _string,size_t * str_len, ObjectInfo* const obje
 
 	int t=objectInfo->typeInf->type;
 
-	if(t==CHAR)
+	if(t==ACHAR)
 		return char_conver(_string,str_len,objectInfo);
 	else if(t==PTR&&objectInfo->typeInf->subObjInfo->typeInf->type==OBJECT)
 		return ptr_conver(_string,str_len,objectInfo);
 	else{
 		int i=J_R_STRING;
 
-		if(t>=INT&&t<=ULLONG)
+		if(t>=CHAR&&t<=ULLONG)
 			i=J_R_NUMBER;
 		else
 			while(i<=J_R_BOOLEAN&&t!=i) ++i;

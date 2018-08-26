@@ -82,3 +82,31 @@ const TypeInf T_INF_CHAR={
 		.size={sizeof(char)},
 		.subObjInfo=(void*)(0)
 };
+
+const TypeInf T_INF_UCHAR={
+		.name="unsigned char",
+		.type=UCHAR,
+		.size={sizeof(unsigned char)},
+		.subObjInfo=(void*)(0)
+};
+
+const TypeInf T_INF_ACHAR={
+		.name="ascii char",
+		.type=ACHAR,
+		.size={sizeof(unsigned char)},
+		.subObjInfo=(void*)(0)
+};
+
+const TypeInf T_INF_SHORT={
+		.name="short",
+		.type=SHORT,
+		.size={sizeof(short)},
+		.subObjInfo=(void*)(0)
+};
+
+const TypeInf T_INF_USHORT={
+		.name="unsigned short",
+		.type=USHORT,
+		.size={sizeof(unsigned short)},
+		.subObjInfo=(void*)(0)
+};

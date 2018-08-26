@@ -55,14 +55,15 @@ void tc_json_cto_obj_array(void) {
 			},
 			.offset = &a
 	};
-    char string[2048] = "[{\"a\":5741,\"b\": -102.6, \"flag\": true, \"x\" : {\"y\" : {\"z\" : \"book书\"} } , \"d\" : [235, 6.85,-52.36 ,352], \"llongs\" : [23525406, -68562342,52754128 ,-28702540]},{\"a\":6741,\"b\": -102.6, \"flag\" : false, \"x\" : {\"y\" : {\"z\" : \"topup\"} } , \"d\" : [235, 6.85,-52.36 ,352], \"llongs\" : [23525406, -68562342,52754128 ,-78702540]}]";
+    char string[] = "[{\"a\":5741,\"b\": -102.6, \"flag\": true, \"x\" : null , \"d\" : [235, 6.85,-52.36 ,352], \"llongs\" : [23525406, -68562342,52754128 ,-28702540]},{\"a\":6741,\"b\": -102.6, \"flag\" : false, \"x\" : {\"y\" : {\"z\" : \"topup\"} } , \"d\" : [235, 6.85,-52.36 ,352], \"llongs\" : [23525406, -68562342,52754128 ,-78702540]}]";
 	int r;
 	CU_ASSERT(0 == (r = json_cto_object(string, &a_array_2)));
 	if (!r) {
 		CU_ASSERT(a[0].a == 5741);
 		CU_ASSERT(fabs(a[0].b - -102.6) < 0.000001);
 		CU_ASSERT(a[0].flag = 1);
-		CU_ASSERT(0 == strcmp(a[0].x->y.z, "book书"));
+		CU_ASSERT(0 == strcmp(a[1].x->y.z, "topup"));
+		CU_ASSERT(a[0].x==NULL);
 		CU_ASSERT(a[0].d[0] == 235);
 		CU_ASSERT(fabs(a[0].d[1] - 6.850000f) < 0.000001);
 		CU_ASSERT(fabs(a[0].d[2] - -52.360000f) < 0.000001);
@@ -112,13 +113,20 @@ void tc_json_cf_obj_array(void){
 			.offset=&a
 	};
 
-	char json_str[2048],
-	*result="[{\"a\":5741,\"b\":-102.6,\"flag\":true,\"x\":{\"y\":{\"z\":\"book书\"}},\"d\":[235,6.85,-52.36,352,0,0,0,0,0,0],\"llongs\":[23525406,-68562342,52754128,-98702540,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"
+	char json_str[2048];
+	const char* result="[{\"a\":5741,\"b\":-102.6,\"flag\":true,\"x\":{\"y\":{\"z\":\"book书\"}},\"d\":[235,6.85,-52.36,352,0,0,0,0,0,0],\"llongs\":[23525406,-68562342,52754128,-98702540,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"
 			"{\"a\":6741,\"b\":-102.6,\"flag\":false,\"x\":null,\"d\":[235,6.85,-52.36,352,0,0,0,0,0,0],\"llongs\":[23525406,-68562342,52754128,-78702540,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}]";
 	int r;
 	CU_ASSERT(0==(r=json_cf_object(json_str, 2048, &a_array_2)));
 	if(!r){
 		CU_ASSERT(0==strcmp(json_str,result));
-		puts(json_str);
 	}
 }
+
+const struct TC_IND ti_object_array={
+		.tc_num=2,
+		.caseMap={
+			{"TC Json_to_Object_array",tc_json_cto_obj_array},
+			{"TC Object_to_Json_array",tc_json_cf_obj_array}
+		}
+};

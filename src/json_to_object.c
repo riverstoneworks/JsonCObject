@@ -35,7 +35,6 @@ static inline void freeRegex(size_t num,regex_t * p_re){
 		regfree(p_re+num);
 	}
 	free(p_re);
-	p_re=NULL;
 }
 
 static inline regex_t * initRegex(const size_t num,const char *pattern[],const int flag[],int *err_no){
@@ -48,7 +47,7 @@ static inline regex_t * initRegex(const size_t num,const char *pattern[],const i
 		for(int i=0;i<num;i++){
 			if((*err_no=regcomp(p_re+i,pattern[i],flag[i]))){
 				freeRegex(i,p_re);
-				free(p_re);
+				p_re=NULL;
 				break;
 			}
 		}
@@ -57,12 +56,16 @@ static inline regex_t * initRegex(const size_t num,const char *pattern[],const i
 }
 
 
-static int numeric_conver(char* _string, ObjectInfo* const numeric,const regex_t *p_re){
+static int numeric_convert(char* _string, ObjectInfo* const numeric,const regex_t *p_re){
 	char * p;
 	switch(numeric->typeInf->type){
 		case FLOAT: *(float*)(numeric->offset)=strtof(_string,&p); break;
 		case DOUBLE: *(double*)(numeric->offset)=strtod(_string,&p); break;
 		case LDOUBLE: *(long double*)(numeric->offset)=strtold(_string,&p);break;
+		case CHAR: *(char*)(numeric->offset)=strtol(_string,&p,0); break;
+		case UCHAR: *(unsigned char*)(numeric->offset)=strtol(_string,&p,0); break;
+		case SHORT: *(short*)(numeric->offset)=strtol(_string,&p,0); break;
+		case USHORT: *(unsigned short*)(numeric->offset)=strtol(_string,&p,0); break;
 		case INT: *(int*)(numeric->offset)=strtol(_string,&p,0); break;
 		case UINT: *(unsigned int*)(numeric->offset)=strtol(_string,&p,0); break;
 		case LONG: *(long*)(numeric->offset)=strtol(_string,&p,0);  break;
@@ -82,7 +85,7 @@ static int numeric_conver(char* _string, ObjectInfo* const numeric,const regex_t
 }
 
 //string[size,pointer_to_string] the format of _string: "..."
-static int string_conver(char* _string, ObjectInfo* const string,const regex_t *p_re){
+static int string_convert(char* _string, ObjectInfo* const string,const regex_t *p_re){
 
 	int l=strlen(++_string)-1,n=string->typeInf->size[1]-1;
 
@@ -126,7 +129,7 @@ static int string_conver(char* _string, ObjectInfo* const string,const regex_t *
 }
 
 // the format of _string is: true OR false
-static int boolean_conver(char* _string, ObjectInfo* const boolean,const regex_t *p_re){
+static int boolean_convert(char* _string, ObjectInfo* const boolean,const regex_t *p_re){
 
 	*(unsigned char*)(boolean->offset)=(_string[0]=='t'?1:0);
 
@@ -134,14 +137,14 @@ static int boolean_conver(char* _string, ObjectInfo* const boolean,const regex_t
 }
 
 // the format of _string is: "c"
-static int char_conver(char* _string, ObjectInfo* const _char,const regex_t *p_re){
+static int char_convert(char* _string, ObjectInfo* const _char,const regex_t *p_re){
 
 	return strlen(_string)==3?(*(char*)(_char->offset)=_string[1])&&0:-1;
 
 }
 
 // array[array_size, ele_size, poiter_to_array]
-static int array_conver(char* _string, ObjectInfo* const array,const regex_t *p_re){
+static int array_convert(char* _string, ObjectInfo* const array,const regex_t *p_re){
 	++_string;
 	_string[strlen(_string)-1]='\0';
 
@@ -186,7 +189,7 @@ static int array_conver(char* _string, ObjectInfo* const array,const regex_t *p_
 	return (long)(*el_offset)/ele_size;
 }
 
-static int object_conver(char* _string, ObjectInfo* const object,const regex_t *p_re){
+static int object_convert(char* _string, ObjectInfo* const object,const regex_t *p_re){
 	#define M_SIZE 3
 	ObjectInfo *o;
 	regmatch_t match[M_SIZE];
@@ -221,7 +224,7 @@ static int object_conver(char* _string, ObjectInfo* const object,const regex_t *
 }
 
 // the memory which pointed by object->offset is only accessed with this pointer
-static int ptr_conver(char* _string, ObjectInfo* const ptr,const regex_t *p_re){
+static int ptr_convert(char* _string, ObjectInfo* const ptr,const regex_t *p_re){
 	void**p=(void**)ptr->offset;
 	if(!p)
 		return -1;
@@ -235,8 +238,8 @@ static int ptr_conver(char* _string, ObjectInfo* const ptr,const regex_t *p_re){
 }
 
 // the memory which pointed by object->offset is only accessed with this pointer
-static inline int null_conver(char* _string, ObjectInfo* const object,const regex_t *p_re){
-	void**p=(void**)object->offset;
+static inline int null_convert(char* _string, ObjectInfo* const ptr,const regex_t *p_re){
+	void**p=(void**)ptr->offset;
 	if(*p){
 		free(*p);
 		*p=NULL;
@@ -244,11 +247,11 @@ static inline int null_conver(char* _string, ObjectInfo* const object,const rege
 	return 0;
 }
 static int (* const conver_by_type[6])(char* _string, ObjectInfo* const data,const regex_t *p_re)={
-		numeric_conver,
-		string_conver,
-		array_conver,
-		object_conver,
-		boolean_conver,
+		numeric_convert,
+		string_convert,
+		array_convert,
+		object_convert,
+		boolean_convert,
 };
 
 static int convert(const regex_t *p_re, char* _string, ObjectInfo* const objectInfo){
@@ -262,16 +265,16 @@ static int convert(const regex_t *p_re, char* _string, ObjectInfo* const objectI
 		return -1;
 	else if(i==J_R_NULL){
 		if(t==PTR&&objectInfo->typeInf->subObjInfo->typeInf->type==OBJECT)
-			return null_conver(_string,objectInfo,p_re);
+			return null_convert(_string,objectInfo,p_re);
 		else
 			return -1;
-	}else if((i==J_R_NUMBER&&t>=INT&&t<=ULLONG)
+	}else if((i==J_R_NUMBER&&t>=CHAR&&t<=ULLONG)
 			||(i!=0&&i==t)){
 		return conver_by_type[i](_string,objectInfo,p_re);
-	}else if(i==J_R_STRING&&t==CHAR)
-		return char_conver(_string,objectInfo,p_re);
+	}else if(i==J_R_STRING&&t==ACHAR)
+		return char_convert(_string,objectInfo,p_re);
 	else if(i==J_R_OBJECT&&t==PTR&&objectInfo->typeInf->subObjInfo->typeInf->type==OBJECT)
-		return ptr_conver(_string,objectInfo,p_re);
+		return ptr_convert(_string,objectInfo,p_re);
 	else
 		return -1;
 
@@ -560,7 +563,8 @@ int json_cto_object_init(){
 
 int json_cto_object_destroy(){
 	if(reg_p!=NULL){
-		freeRegex(1,reg_p);
+		freeRegex(9,reg_p);
+		reg_p=NULL;
 		return 0;
 	}else
 		return -1;

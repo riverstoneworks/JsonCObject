@@ -17,14 +17,18 @@ typedef struct TYPE_INF{
 		ARRAY,
 		OBJECT,
 		BOOLEAN,
-		CHAR,
-		INT = 11,
+		ACHAR,
+		CHAR=11,
+		SHORT,
+		INT,
 		LONG,
 		LLONG,
 		FLOAT,
 		DOUBLE,
 		LDOUBLE,
-		UINT = 21,
+		UCHAR= 21,
+		USHORT,
+		UINT,
 		ULONG,
 		ULLONG,
 		PTR
@@ -86,5 +90,10 @@ extern const TypeInf T_INF_FLOAT;
 extern const TypeInf T_INF_DOUBLE;;
 extern const TypeInf T_INF_LDOUBLE;
 extern const TypeInf T_INF_BOOLEAN;
+extern const TypeInf T_INF_CHAR;
+extern const TypeInf T_INF_UCHAR;
+extern const TypeInf T_INF_ACHAR;
+extern const TypeInf T_INF_SHORT;
+extern const TypeInf T_INF_USHORT;
 
 #endif /* TYPE_INFO_H_ */
