@@ -6,44 +6,58 @@
  */
 #include "../typeInfo/type_info.h"
 
-const TypeInf T_INF_INT={
-		.name="int",
-		.type=INT,
+const TypeInf T_INF_INT8={
+		.name="int8",
+		.type=INT8,
+		.size={sizeof(char)},
+		.subObjInfo=(void*)(0)
+};
+
+const TypeInf T_INF_UINT8={
+		.name="uint8",
+		.type=UINT8,
+		.size={sizeof(char)},
+		.subObjInfo=(void*)(0)
+};
+
+const TypeInf T_INF_INT16={
+		.name="int16",
+		.type=INT16,
+		.size={sizeof(short)},
+		.subObjInfo=(void*)(0)
+};
+
+const TypeInf T_INF_UINT16={
+		.name="uint16",
+		.type=UINT16,
+		.size={sizeof(short)},
+		.subObjInfo=(void*)(0)
+};
+
+const TypeInf T_INF_INT32={
+		.name="int32",
+		.type=INT32,
 		.size={sizeof(int)},
 		.subObjInfo=(void*)(0)
 };
 
-const TypeInf T_INF_UINT={
-		.name="unsigned int",
-		.type=UINT,
-		.size={sizeof(unsigned int)},
+const TypeInf T_INF_UINT32={
+		.name="uint32",
+		.type=UINT32,
+		.size={sizeof(int)},
 		.subObjInfo=(void*)(0)
 };
 
-const TypeInf T_INF_ULONG={
-		.name="unsigned long",
-		.type=ULONG,
-		.size={sizeof(unsigned long)},
+const TypeInf T_INF_UINT64={
+		.name="uint64",
+		.type=UINT64,
+		.size={sizeof(long long)},
 		.subObjInfo=(void*)(0)
 };
 
-const TypeInf T_INF_ULLONG={
-		.name="unsigned long long",
-		.type=ULLONG,
-		.size={sizeof(unsigned long long)},
-		.subObjInfo=(void*)(0)
-};
-
-const TypeInf T_INF_LONG={
-		.name="long",
-		.type=LONG,
-		.size={sizeof(long)},
-		.subObjInfo=(void*)(0)
-};
-
-const TypeInf T_INF_LLONG={
-		.name="long long",
-		.type=LLONG,
+const TypeInf T_INF_INT64={
+		.name="int64",
+		.type=INT64,
 		.size={sizeof(long long)},
 		.subObjInfo=(void*)(0)
 };
@@ -72,41 +86,13 @@ const TypeInf T_INF_LDOUBLE={
 const TypeInf T_INF_BOOLEAN={
 		.name="boolean",
 		.type=BOOLEAN,
-		.size={sizeof(unsigned char)},
-		.subObjInfo=(void*)(0)
-};
-
-const TypeInf T_INF_CHAR={
-		.name="char",
-		.type=CHAR,
 		.size={sizeof(char)},
-		.subObjInfo=(void*)(0)
-};
-
-const TypeInf T_INF_UCHAR={
-		.name="unsigned char",
-		.type=UCHAR,
-		.size={sizeof(unsigned char)},
 		.subObjInfo=(void*)(0)
 };
 
 const TypeInf T_INF_ACHAR={
 		.name="ascii char",
 		.type=ACHAR,
-		.size={sizeof(unsigned char)},
-		.subObjInfo=(void*)(0)
-};
-
-const TypeInf T_INF_SHORT={
-		.name="short",
-		.type=SHORT,
-		.size={sizeof(short)},
-		.subObjInfo=(void*)(0)
-};
-
-const TypeInf T_INF_USHORT={
-		.name="unsigned short",
-		.type=USHORT,
-		.size={sizeof(unsigned short)},
+		.size={sizeof(char)},
 		.subObjInfo=(void*)(0)
 };

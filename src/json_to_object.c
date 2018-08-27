@@ -62,16 +62,14 @@ static int numeric_convert(char* _string, ObjectInfo* const numeric,const regex_
 		case FLOAT: *(float*)(numeric->offset)=strtof(_string,&p); break;
 		case DOUBLE: *(double*)(numeric->offset)=strtod(_string,&p); break;
 		case LDOUBLE: *(long double*)(numeric->offset)=strtold(_string,&p);break;
-		case CHAR: *(char*)(numeric->offset)=strtol(_string,&p,0); break;
-		case UCHAR: *(unsigned char*)(numeric->offset)=strtol(_string,&p,0); break;
-		case SHORT: *(short*)(numeric->offset)=strtol(_string,&p,0); break;
-		case USHORT: *(unsigned short*)(numeric->offset)=strtol(_string,&p,0); break;
-		case INT: *(int*)(numeric->offset)=strtol(_string,&p,0); break;
-		case UINT: *(unsigned int*)(numeric->offset)=strtol(_string,&p,0); break;
-		case LONG: *(long*)(numeric->offset)=strtol(_string,&p,0);  break;
-		case ULONG: *(unsigned long*)(numeric->offset)=strtoul(_string,&p,0); break;
-		case LLONG: *(long long*)(numeric->offset)=strtoll(_string,&p,0); break;
-		case ULLONG: *(unsigned long long*)(numeric->offset)=strtoull(_string,&p,0); break;
+		case INT8: *(char*)(numeric->offset)=strtol(_string,&p,0); break;
+		case UINT8: *(unsigned char*)(numeric->offset)=strtol(_string,&p,0); break;
+		case INT16: *(short*)(numeric->offset)=strtol(_string,&p,0); break;
+		case UINT16: *(unsigned short*)(numeric->offset)=strtol(_string,&p,0); break;
+		case INT32: *(int*)(numeric->offset)=strtol(_string,&p,0); break;
+		case UINT32: *(unsigned int*)(numeric->offset)=strtol(_string,&p,0); break;
+		case UINT64: *(unsigned long*)(numeric->offset)=strtoul(_string,&p,0); break;
+		case INT64: *(long long*)(numeric->offset)=strtoll(_string,&p,0); break;
 		default:
 			return -1;
 	}
@@ -131,15 +129,17 @@ static int string_convert(char* _string, ObjectInfo* const string,const regex_t 
 // the format of _string is: true OR false
 static int boolean_convert(char* _string, ObjectInfo* const boolean,const regex_t *p_re){
 
-	*(unsigned char*)(boolean->offset)=(_string[0]=='t'?1:0);
-
+	*(char*)(boolean->offset)=(_string[0]=='t'?1:0);
 	return 0;
 }
 
-// the format of _string is: "c"
-static int char_convert(char* _string, ObjectInfo* const _char,const regex_t *p_re){
+/* only ASCII characters (1~127) can be accepted,
+ * because REGEXC can not deal with extend ASCI characters.
+ * also can deal with unicode char
+ */
+static int char_convert(char* _string, ObjectInfo* const _achar,const regex_t *p_re){
 
-	return strlen(_string)==3?(*(char*)(_char->offset)=_string[1])&&0:-1;
+	return strlen(_string)==3?(*(char*)(_achar->offset)=_string[1])&&0:-1;
 
 }
 
@@ -268,7 +268,7 @@ static int convert(const regex_t *p_re, char* _string, ObjectInfo* const objectI
 			return null_convert(_string,objectInfo,p_re);
 		else
 			return -1;
-	}else if((i==J_R_NUMBER&&t>=CHAR&&t<=ULLONG)
+	}else if((i==J_R_NUMBER&&t>=INT8&&t<=UINT64)
 			||(i!=0&&i==t)){
 		return conver_by_type[i](_string,objectInfo,p_re);
 	}else if(i==J_R_STRING&&t==ACHAR)
@@ -525,7 +525,7 @@ static const char regx_grep_object_attr[]=
 				"\\]"
 			")";
 
-static const char regx_test[]="^\"([^\"\\\\\f\n\r\b\t]|\\\\u[0-9A-Fa-f]{4}|\\\\[\\\\\"/bnrtf])*\"$";
+static const char regx_test[]="^\\-[0-9]*$";
 
 static const char *pattern[]= {
 		regx_numeric,
@@ -547,7 +547,7 @@ static const int flag[]={
 		REG_EXTENDED|REG_NOSUB,
 		REG_EXTENDED,
 		REG_EXTENDED,
-		REG_EXTENDED|REG_NOSUB
+		REG_EXTENDED|REG_NOSUB|REG_NEWLINE
 };
 static regex_t* reg_p=NULL;
 

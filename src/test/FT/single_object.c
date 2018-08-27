@@ -23,7 +23,7 @@ typedef struct A{
 	long long llongs[20];
 }AA;
 
-static const struct TYPE_INF T_INF_AA = T(AA, 6, O(a,T_INF_INT,0), O(b,T_INF_DOUBLE,8),
+static const struct TYPE_INF T_INF_AA = T(AA, 6, O(a,T_INF_INT32,0), O(b,T_INF_DOUBLE,8),
 		O(flag,T_INF_BOOLEAN,16),
 		O(x,T_PTR(struct X*,
 					O(x,T(struct X,1,
@@ -34,7 +34,7 @@ static const struct TYPE_INF T_INF_AA = T(AA, 6, O(a,T_INF_INT,0), O(b,T_INF_DOU
 				),
 		24),
 		O(d,T_ARRAY(long double,10,T_INF_LDOUBLE),32),
-		O(llongs,T_ARRAY(long long,20,T_INF_LLONG),192));
+		O(llongs,T_ARRAY(long long,20,T_INF_INT64),192));
 
 
 /* Simple test of json_cto_object().

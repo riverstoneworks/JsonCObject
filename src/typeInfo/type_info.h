@@ -18,19 +18,17 @@ typedef struct TYPE_INF{
 		OBJECT,
 		BOOLEAN,
 		ACHAR,
-		CHAR=11,
-		SHORT,
-		INT,
-		LONG,
-		LLONG,
+		INT8=11,
+		INT16,
+		INT32,
+		INT64,
 		FLOAT,
 		DOUBLE,
 		LDOUBLE,
-		UCHAR= 21,
-		USHORT,
-		UINT,
-		ULONG,
-		ULLONG,
+		UINT8= 21,
+		UINT16,
+		UINT32,
+		UINT64,
 		PTR
 	}type;
 	//size[0] is size of base type (int,float etc.) or length of string or element size in array;  size[1] is element number in array
@@ -80,20 +78,18 @@ struct OBJECT_INF{
 
 
 //base type info
-extern const TypeInf T_INF_INT;
-extern const TypeInf T_INF_UINT;
-extern const TypeInf T_INF_ULONG;
-extern const TypeInf T_INF_ULLONG;
-extern const TypeInf T_INF_LONG;
-extern const TypeInf T_INF_LLONG;
+extern const TypeInf T_INF_INT8;
+extern const TypeInf T_INF_UINT8;
+extern const TypeInf T_INF_INT16;
+extern const TypeInf T_INF_UINT16;
+extern const TypeInf T_INF_INT32;
+extern const TypeInf T_INF_UINT32;
+extern const TypeInf T_INF_INT64;
+extern const TypeInf T_INF_UINT64;
 extern const TypeInf T_INF_FLOAT;
-extern const TypeInf T_INF_DOUBLE;;
+extern const TypeInf T_INF_DOUBLE;
 extern const TypeInf T_INF_LDOUBLE;
 extern const TypeInf T_INF_BOOLEAN;
-extern const TypeInf T_INF_CHAR;
-extern const TypeInf T_INF_UCHAR;
 extern const TypeInf T_INF_ACHAR;
-extern const TypeInf T_INF_SHORT;
-extern const TypeInf T_INF_USHORT;
 
 #endif /* TYPE_INFO_H_ */

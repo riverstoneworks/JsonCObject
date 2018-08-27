@@ -26,22 +26,18 @@ static int numeric_conver(char** const  _string,size_t * str_len, ObjectInfo* co
 			n=sprintf(s,"%lG",*(double*)(numeric->offset)); break;
 		case LDOUBLE:
 			n=sprintf(s,"%.16LG",*(long double*)(numeric->offset));break;
-		case CHAR:
+		case INT8:
 			n=sprintf(s,"%d",*(char*)(numeric->offset)); break;
-		case UCHAR:
+		case UINT8:
 			n=sprintf(s,"%d",*(unsigned char*)(numeric->offset)); break;
-		case INT:
+		case INT32:
 			n=sprintf(s,"%d",*(int*)(numeric->offset)); break;
-		case UINT:
+		case UINT32:
 			n=sprintf(s,"%u",*(unsigned int*)(numeric->offset)); break;
-		case LONG:
-			n=sprintf(s,"%ld",*(long*)(numeric->offset));  break;
-		case ULONG:
+		case UINT64:
 			n=sprintf(s,"%ld",*(unsigned long*)(numeric->offset)); break;
-		case LLONG:
+		case INT64:
 			n=sprintf(s,"%lld",*(long long*)(numeric->offset)); break;
-		case ULLONG:
-			n=sprintf(s,"%lld",*(unsigned long long*)(numeric->offset)); break;
 		default:
 			return -1;
 	}
@@ -55,7 +51,7 @@ static int numeric_conver(char** const  _string,size_t * str_len, ObjectInfo* co
 	return 0;
 }
 
-//string[size,pointer_to_string] the format of _string: "..."
+// the format of _string: "..."
 static int string_conver(char** const _string, size_t* str_len, ObjectInfo* const string){
 	if(!string->offset){
 		if(*str_len>3)
@@ -65,16 +61,53 @@ static int string_conver(char** const _string, size_t* str_len, ObjectInfo* cons
 	}
 
 	size_t l=*str_len-2,n=strlen((const char*)(string->offset));
-
+	int i=0,j=1;
 	if(l<n)
 		return -1;
-	else if(n>0)
-		strncpy((*_string)+1,(char*)(string->offset),n);
+	else if(n>0){
+		const char* const p=(char*)(string->offset);
+		while (i < n && j < l - 1) {
+			switch (p[i]) {
+			case '\n':
+				(*_string)[j++] = '\\';
+				(*_string)[j++] = 'n';
+				break;
+			case '\r':
+				(*_string)[j++] = '\\';
+				(*_string)[j++] = 'r';
+				break;
+			case '\t':
+				(*_string)[j++] = '\\';
+				(*_string)[j++] = 't';
+				break;
+			case '\f':
+				(*_string)[j++] = '\\';
+				(*_string)[j++] = 'f';
+				break;
+			case '\b':
+				(*_string)[j++] = '\\';
+				(*_string)[j++] = 'b';
+				break;
+			case '"':
+				(*_string)[j++] = '\\';
+				(*_string)[j++] = '"';
+				break;
+			case '\\':
+				(*_string)[j++] = '\\';
+				(*_string)[j++] = '\\';
+				break;
+			default:
+				(*_string)[j++] = p[i];
+			}
+			++i;
+		}
+		if(i<n)
+			return -1;
+	}
 
-
-	(*_string)[0]=(*_string)[n+1]='"';
-	*_string+=(n+2);
-	*str_len-=(n+2);
+	(*_string)[0]=(*_string)[j++]='"';
+	*_string+=j;
+	*str_len-=j;
 	return 0;
 }
 
@@ -209,7 +242,7 @@ static int convert(char** const _string,size_t * str_len, ObjectInfo* const obje
 	else{
 		int i=J_R_STRING;
 
-		if(t>=CHAR&&t<=ULLONG)
+		if(t>=INT8&&t<=UINT64)
 			i=J_R_NUMBER;
 		else
 			while(i<=J_R_BOOLEAN&&t!=i) ++i;

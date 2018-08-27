@@ -50,7 +50,7 @@ int main()
    }
 
    /* add the tests to the suite */
-   /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
+   /* NOTE - ORDER IS IMPORTANT - ACCORDING TO THE REQUIRES OF THE CASE */
    n=sizeof(tc_ind_fc)/sizeof(struct TC_IND*);
    for(int i=0;i<n;++i)
 	   for(int j=0;j<tc_ind_fc[i]->tc_num; ++j)
@@ -60,7 +60,6 @@ int main()
 			  return CU_get_error();
 		   }
 
-
    pSuite = CU_add_suite("Suite_UT", init_suite_UT, clean_suite_UT);
    if (NULL == pSuite) {
       CU_cleanup_registry();
@@ -69,7 +68,7 @@ int main()
 
 
    /* add the tests to the suite */
-   /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
+   /* NOTE - ORDER IS IMPORTANT -*/
    n=sizeof(tc_ind_uc)/sizeof(struct TC_IND*);
    for(int i=0;i<n;++i)
 	   for(int j=0;j<tc_ind_uc[i]->tc_num; ++j)
