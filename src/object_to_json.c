@@ -19,27 +19,42 @@ static int convert(char** const ,size_t *, ObjectInfo* const );
 static int numeric_conver(char** const  _string,size_t * str_len, ObjectInfo* const numeric){
 	char s[24];
 	int n;
-	switch(numeric->typeInf->type){
-		case FLOAT:
-			n=sprintf(s,"%G",*(float*)(numeric->offset)); break;
-		case DOUBLE:
-			n=sprintf(s,"%lG",*(double*)(numeric->offset)); break;
-		case LDOUBLE:
-			n=sprintf(s,"%.16LG",*(long double*)(numeric->offset));break;
-		case INT8:
-			n=sprintf(s,"%d",*(char*)(numeric->offset)); break;
-		case UINT8:
-			n=sprintf(s,"%d",*(unsigned char*)(numeric->offset)); break;
-		case INT32:
-			n=sprintf(s,"%d",*(int*)(numeric->offset)); break;
-		case UINT32:
-			n=sprintf(s,"%u",*(unsigned int*)(numeric->offset)); break;
-		case UINT64:
-			n=sprintf(s,"%ld",*(unsigned long*)(numeric->offset)); break;
-		case INT64:
-			n=sprintf(s,"%lld",*(long long*)(numeric->offset)); break;
-		default:
-			return -1;
+	switch (numeric->typeInf->type) {
+	case FLOAT:
+		n = sprintf(s, "%G", *(float*) (numeric->offset));
+		break;
+	case DOUBLE:
+		n = sprintf(s, "%lG", *(double*) (numeric->offset));
+		break;
+	case LDOUBLE:
+		n = sprintf(s, "%.16LG", *(long double*) (numeric->offset));
+		break;
+	case INT8:
+		n = sprintf(s, "%d", *(char*) (numeric->offset));
+		break;
+	case UINT8:
+		n = sprintf(s, "%d", *(unsigned char*) (numeric->offset));
+		break;
+	case INT16:
+		n = sprintf(s, "%d", *(short*) (numeric->offset));
+		break;
+	case UINT16:
+		n = sprintf(s, "%d", *(unsigned short*) (numeric->offset));
+		break;
+	case INT32:
+		n = sprintf(s, "%d", *(int*) (numeric->offset));
+		break;
+	case UINT32:
+		n = sprintf(s, "%u", *(unsigned int*) (numeric->offset));
+		break;
+	case UINT64:
+		n = sprintf(s, "%llu", *(unsigned long long*) (numeric->offset));
+		break;
+	case INT64:
+		n = sprintf(s, "%lld", *(long long*) (numeric->offset));
+		break;
+	default:
+		return -1;
 	}
 	if(n<0||n>*str_len){
 		puts(strerror(errno));

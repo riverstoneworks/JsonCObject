@@ -87,7 +87,7 @@ static void tc_string_convert(void){
 	if(!r){	CU_ASSERT(strcmp(str,"asdfghjklqwertyuiopzxcvbnm123456789!@#$%^&*()_+|[];',./-=QWERTYUIOP{}ASDFGHJKL:ZXCVBNM<>?\\\""));}
 }
 
-const struct TC_IND ti_numeric_convert={
+const struct TC_IND ti_basic_type_convert_to_obj={
 		.tc_num=4,
 		.caseMap={
 			{"TC numeric convert",tc_numeric_convert},

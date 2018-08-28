@@ -9,7 +9,8 @@
 #include "tc_suite_UT.h"
 
 const struct TC_IND* tc_ind_uc[]={
-		&ti_numeric_convert
+		&ti_basic_type_convert_to_obj,
+		&ti_basic_type_convert_to_str
 };
 
 /* The suite initialization function.

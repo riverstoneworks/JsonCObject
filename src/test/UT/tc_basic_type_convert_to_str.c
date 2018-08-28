@@ -40,16 +40,16 @@ static void tc_numeric_convert(void){
 	if(!r)	CU_ASSERT(strcmp(_ui8,"255")==0);
 	(i16=-32768);
 	CU_ASSERT(0==(r=json_cf_object(_i16,30, &(ObjectInfo){.typeInf=&T_INF_INT16,.offset=&(i16)})));
-	if(!r)	CU_ASSERT(strcmp(_ui8,"-32768")==0);
+	if(!r)	CU_ASSERT(strcmp(_i16,"-32768")==0);
 	i16=32767;
 	CU_ASSERT(0==(r=json_cf_object(_i16,30, &(ObjectInfo){.typeInf=&T_INF_INT16,.offset=&(i16)})));
-	if(!r)	CU_ASSERT(strcmp(_ui8,"32767")==0);
+	if(!r)	CU_ASSERT(strcmp(_i16,"32767")==0);
 	ui16=0;
 	CU_ASSERT(0==(r=json_cf_object(_ui16,30, &(ObjectInfo){.typeInf=&T_INF_UINT16,.offset=&(ui16)})));
-	if(!r)	CU_ASSERT(strcmp(_i16,"0")==0);
+	if(!r)	CU_ASSERT(strcmp(_ui16,"0")==0);
 	ui16=65535;
 	CU_ASSERT(0==(r=json_cf_object(_ui16,30, &(ObjectInfo){.typeInf=&T_INF_UINT16,.offset=&(ui16)})));
-	if(!r)	CU_ASSERT(strcmp(_i16,"65535")==0);
+	if(!r)	CU_ASSERT(strcmp(_ui16,"65535")==0);
 	i32=-2147483648;
 	CU_ASSERT(0==(r=json_cf_object(_i32,30, &(ObjectInfo){.typeInf=&T_INF_INT32,.offset=&(i32)})));
 	if(!r)	CU_ASSERT(strcmp(_i32,"-2147483648")==0);
@@ -104,7 +104,7 @@ static void tc_string_convert(void){
 	if(!r){	CU_ASSERT(strcmp(str,"\"asdfghjklqwertyuiopzxcvbnm123456789!@#$%^&*()_+|[];',./-=QWERTYUIOP{}ASDFGHJKL:ZXCVBNM<>?\\\\\""));}
 }
 
-const struct TC_IND ti_to_str_numeric_convert={
+const struct TC_IND ti_basic_type_convert_to_str={
 		.tc_num=4,
 		.caseMap={
 			{"TC numeric convert",tc_numeric_convert},
