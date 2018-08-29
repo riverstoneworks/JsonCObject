@@ -1,2 +1,2 @@
-# jsonCstruct
-Convert Json string to struct for C
+# jsonCObject
+Convert date format between JSON and C Object
