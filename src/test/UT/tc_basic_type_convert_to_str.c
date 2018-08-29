@@ -86,6 +86,9 @@ static void tc_achar_convert(void){
 		CU_ASSERT(0==r);
 		if(!r){	CU_ASSERT(str[1]==i||(str[2]=='\\'||str[2]=='"'||str[2]=='r'||str[2]=='t'||str[2]=='f'||str[2]=='n'||str[2]=='b'));}
 	}
+
+	char s[]={'"',0xdf,0xbf,0x0f,'"','\0'};
+	printf("%d\n",verify_test(1,s));
 }
 
 static void tc_bool_convert(void){
@@ -102,6 +105,10 @@ static void tc_string_convert(void){
 		str[512]={0},s[512]="asdfghjklqwertyuiopzxcvbnm123456789!@#$%^&*()_+|[];',./-=QWERTYUIOP{}ASDFGHJKL:ZXCVBNM<>?\\\"";
 	CU_ASSERT(0==(r=json_cf_object(str,512, &(ObjectInfo){.typeInf=&T_STRING(512),.offset=&s})));
 	if(!r){	CU_ASSERT(strcmp(str,"\"asdfghjklqwertyuiopzxcvbnm123456789!@#$%^&*()_+|[];',./-=QWERTYUIOP{}ASDFGHJKL:ZXCVBNM<>?\\\\\""));}
+	char ss[]={'"',0xe4,0xbd,0xa0,'"','\0'};
+	CU_ASSERT(0==(r=json_cf_object(str,512, &(ObjectInfo){.typeInf=&T_STRING(512),.offset=&ss})));
+	if(!r){	CU_ASSERT(strcmp(str,"\\\"你\\\""));}
+
 }
 
 const struct TC_IND ti_basic_type_convert_to_str={
