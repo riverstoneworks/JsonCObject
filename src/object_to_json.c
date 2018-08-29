@@ -66,7 +66,15 @@ static int numeric_conver(char** const  _string,size_t * str_len, ObjectInfo* co
 	return 0;
 }
 
-// the format of _string: "..."
+/* the format of _string: "..."
+ * Only the characters encoded by UTF-8  can be accepted
+ * UTF-8 code rule:
+ * 2 Bytes : 1100xxxx 10xxxxxx
+ * 3 Bytes : 1110xxxx 10xxxxxx 10xxxxxx
+ * 4 Bytes : 1111xxxx 10xxxxxx 10xxxxxx 10xxxxxx
+ * 5 Bytes : 11111xxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+ * ...
+ */
 static int string_conver(char** const _string, size_t* str_len, ObjectInfo* const string){
 	if(!string->offset){
 		if(*str_len>3)
@@ -113,6 +121,26 @@ static int string_conver(char** const _string, size_t* str_len, ObjectInfo* cons
 				break;
 			default:
 				(*_string)[j++] = p[i];
+				char mask = 0xC0;
+				switch (p[i] & mask) {
+				case (char)0x80:
+					return -1;
+					break;
+				case (char)0xC0:{
+					char t = 0;
+					while (t++ < 8) {
+						if ((p[i + t] & 0xC0) == 0x80 && j < l)
+							(*_string)[j++] = p[i + t];
+						else
+							return -1;
+						mask = (mask >> 1);
+						if ((p[i] & mask) != mask)
+							break;
+					}
+					i += t;
+					break;
+				}default:;
+				}
 			}
 			++i;
 		}
@@ -141,7 +169,7 @@ static int boolean_conver(char** const _string,size_t* str_len, ObjectInfo* cons
 	return 0;
 }
 
-//
+//Single ASCII character can be accepted
 static int char_conver(char** const _string,size_t* str_len, ObjectInfo* const _char){
 	return *str_len>2?(*(*_string)++='"')&&(*(*_string)++=*(char*)(_char->offset))&&(*(*_string)++='"')&&(*str_len-=3)&&0:-1;
 }
