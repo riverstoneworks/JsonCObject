@@ -18,35 +18,35 @@
 ### I.2. json_cto_object : 
    Convert JSON to a C-Object, an instance of some structure.
    - Parameters:
-      1. ***char\* jsonStr***
+      1. ***char* jsonStr***
          >It points to JSON string to be converted.
-      2. ***ObjectInfo\* objInfo*** : 
+      2. ***ObjectInfo* objInfo*** : 
          >It points to an instance of ***ObjectInfo*** which is a structure to describe the information about an object (an  instance of some structure).
    - Return:
      >type:***int*** , 0 for success or -1 for failure.
    - **Note**:
-     >Before this, set locate "LC\_CTYPE;UTF-8" for Unicode char transform between utf-8 and utf-16. (e.g. UTF-16 char "\u040F" in JSON string)
+     >Before this, set locate "LC_CTYPE;UTF-8" for Unicode char transform between utf-8 and utf-16. (e.g. UTF-16 char "\u040F" in JSON string)
      ```C
-				 if(!strstr(setlocale(LC\_CTYPE, NULL),"UTF-8")) 
-					if(!strstr(setlocale(LC\_CTYPE, ""),"UTF-8"))
-						setlocale(LC\_CTYPE, "en\_US.UTF-8"); 
+	 if(!strstr(setlocale(LC_CTYPE, NULL),"UTF-8")) 
+		if(!strstr(setlocale(LC_CTYPE, ""),"UTF-8"))
+			setlocale(LC_CTYPE, "en_US.UTF-8"); 
      ```
 ### I.3. json_cf_object
    Convert object to JSON string
    - Parameters:
-      1. char* jsonStr
+      1. ***char* jsonStr***
          >It points to buffer which is used to store the result. And it will cause failure when the buffer size is not enough.
-      2. size_t size
+      2. ***size_t size***
          >The length of the buffer pointed by jsonStr.
-      3. ObjectInfo\* objInfo
+      3. ***ObjectInfo* objInfo***
          >It points to an instance of ObjectInfo which is a structure to describe the information about an object (an  instance of some structure).
    - Return:
 	 >0 for success or -1 for failure.
 
-### I.4. json\_cto\_object\_destroy 
+### I.4. json_cto_object_destroy 
    Clear internal objects at the final of conversion.
    - Return:
-	 >0 for success or -1 for failure.
+     >0 for success or -1 for failure.
 
 ## II. Example
    ```C
