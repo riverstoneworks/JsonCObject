@@ -68,12 +68,15 @@ static int numeric_conver(char** const  _string,size_t * str_len, ObjectInfo* co
 
 /* the format of _string: "..."
  * Only the characters encoded by UTF-8  can be accepted
+<<<<<<< HEAD
  * UTF-8 code rule:
  * 2 Bytes : 1100xxxx 10xxxxxx
  * 3 Bytes : 1110xxxx 10xxxxxx 10xxxxxx
  * 4 Bytes : 1111xxxx 10xxxxxx 10xxxxxx 10xxxxxx
  * 5 Bytes : 11111xxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
  * ...
+=======
+>>>>>>> branch 'master' of https://github.com/riverstoneworks/JsonCObject.git
  */
 static int string_conver(char** const _string, size_t* str_len, ObjectInfo* const string){
 	if(!string->offset){
