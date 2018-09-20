@@ -23,7 +23,7 @@ typedef struct A{
 	long long llongs[20];
 }AA;
 
-static const struct TYPE_INF T_INF_AA = T(AA, 6, O(a,T_INF_INT32,0), O(b,T_INF_DOUBLE,8),
+static const TypeInf T_INF_AA = T(AA, 6, O(a,T_INF_INT32,0), O(b,T_INF_DOUBLE,8),
 		O(flag,T_INF_BOOLEAN,16),
 		O(x,T_PTR(struct X*,
 					O(x,T(struct X,1,
