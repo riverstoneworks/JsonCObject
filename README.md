@@ -1,7 +1,7 @@
 # **JsonCObject API Reference Manual**
 ## I. Purpose
-Convert JSON and C Object to each other.
-## II. Convert Rule
+Map JSON and C Object to each other.
+## II. Mapping Rule
 ### II.1 Type Map
    JSON Type|C Type|note
    :---:|:--:|:---:
@@ -12,7 +12,7 @@ Convert JSON and C Object to each other.
    object | struct |
 ### II.2 TypeInf & ObjectInfo
    1. Mapping is based on *TypeInf* description of C Struct infomation and *ObjectInfo* description of C object information. They are all struct type, have the following relationships:
-      > ![](./TypeInf_ObjectInfo.svg)
+      ![](./TypeInf_ObjectInfo.svg)
    2. It is necessary to creates an *ObjectInfo* instance for the object to participate in conversion. For example:
       ```C
       struct A {
@@ -53,7 +53,7 @@ Convert JSON and C Object to each other.
    1. In JSON, an object is a wrapper around a set of data, just like struct in C. And they can map to each other.
    2. It use Regex Match Tracer to grep key-value in JSON.
    3. Mapping is dependent on the object description by *ObjectInfo*.
-   4. The structures of JSON object and C object must match. For example:
+   4. The type & name of elements in JSON object and C object must match. For example:
 	  C struct
       ```C
       struct A {
