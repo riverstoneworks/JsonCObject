@@ -12,7 +12,7 @@ Map JSON and C Object to each other.
    object | struct |
 ### II.2 TypeInf & ObjectInfo
    1. Mapping is based on *TypeInf* description of C Struct infomation and *ObjectInfo* description of C object information. They are all struct type, have the following relationships:
-       ![](./TypeInf_ObjectInfo.svg)
+      > ![](./TypeInf_ObjectInfo.svg)
    2. It is necessary to creates an *ObjectInfo* instance for the object to participate in conversion. For example:
       ```C
       struct A {
