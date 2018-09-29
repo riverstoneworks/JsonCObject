@@ -224,4 +224,4 @@ Similar to Object Mapping.
 ## V. NOTE
    - JsonCObject on github: https://github.com/riverstoneworks/JsonCObject
 
-[1]:https://github.com/riverstoneworks/JsonCObject
+[1]:https://github.com/riverstoneworks/CTypeInfo

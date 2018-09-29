@@ -23,18 +23,18 @@ typedef struct A{
 	long long llongs[20];
 }AA;
 
-static const TypeInf T_INF_AA = T(AA, 6, O(a,T_INF_INT32,0), O(b,T_INF_DOUBLE,8),
-		O(flag,T_INF_BOOLEAN,16),
-		O(x,T_PTR(struct X*,
-					O(x,T(struct X,1,
-						O(y,T(struct Y,1,
-								O(z,T_STRING(20),0)
-							),0)
-					),0)
-				),
-		24),
-		O(d,T_ARRAY(long double,10,T_INF_LDOUBLE),32),
-		O(llongs,T_ARRAY(long long,20,T_INF_INT64),192));
+static const TypeInf T_INF_AA = T(AA, 6,
+		O_INT32(a,0),
+		O_DOUBLE(b,8),
+		O_BOOLEAN(flag,16),
+		O_PTR_OBJ(x,
+				T(struct X,1,
+					O(y,T(struct Y,1,
+							O_STR(z,20,0)
+						),0)
+				),24),
+		O_ARRAY_LDOUBLE(d,10,32),
+		O_ARRAY_INT64(llongs,20,192));
 
 
 /* Simple test of json_cto_object().
@@ -56,8 +56,8 @@ void tc_json_cto_obj(void) {
 		CU_ASSERT(a.flag = 1);
 		CU_ASSERT(0 == strcmp(a.x->y.z, "䐠book"));
 		CU_ASSERT(a.d[0] == 235);
-		CU_ASSERT(fabs(a.d[1] - 6.850000f) < 0.000001);
-		CU_ASSERT(fabs(a.d[2] - -52.360000f) < 0.000001);
+		CU_ASSERT(fabsl(a.d[1] - 6.850000f) < 0.000001);
+		CU_ASSERT(fabsl(a.d[2] - -52.360000f) < 0.000001);
 		CU_ASSERT(a.d[3] == 352);
 		CU_ASSERT(a.llongs[0] == 23525406);
 		CU_ASSERT(a.llongs[1] == -68562342);
