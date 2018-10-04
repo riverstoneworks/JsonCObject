@@ -7,7 +7,7 @@
 
 #ifndef JSONCOBJECT_H_
 #define JSONCOBJECT_H_
-#include "typeInfo/type_info.h"
+#include "type_info.h"
 /*
  * Before this, set locate LC_CTYPE "*.UTF-8" for Unicode char transform between utf-8 and utf-16.
  * e.g. UTF-16 char "\u040f" in JSON string
