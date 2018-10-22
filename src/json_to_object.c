@@ -13,7 +13,7 @@
 #include <errno.h>
 
 #include "json_type.h"
-#include "jsonCObject.h"
+#include "JsonCObject/jsonCObject.h"
 
 static int convert(const regex_t*,char* , ObjectInfo* const );
 

@@ -12,7 +12,7 @@
 #include <errno.h>
 
 #include "json_type.h"
-#include "jsonCObject.h"
+#include "JsonCObject/jsonCObject.h"
 
 static int convert(char** const ,size_t *, ObjectInfo* const );
 

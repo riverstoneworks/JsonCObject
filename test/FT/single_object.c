@@ -5,7 +5,8 @@
  *      Author: Like.Z(sxpc722@aliyun.com)
  */
 #include <CUnit/Basic.h>
-#include "../../jsonCObject.h"
+
+#include "JsonCObject/jsonCObject.h"
 #include "tc_suite_FT.h"
 
 struct X {
