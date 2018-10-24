@@ -5,8 +5,9 @@
  *      Author: Like.Z(sxpc722@aliyun.com)
  */
 #include <locale.h>
-
+#include <string.h>
 #include "tc_suite_UT.h"
+#include "JsonCObject/jsonCObject.h"
 
 const struct TC_IND* tc_ind_uc[]={
 		&ti_basic_type_convert_to_obj,

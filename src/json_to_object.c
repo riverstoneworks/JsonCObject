@@ -17,14 +17,6 @@
 
 static int convert(const regex_t*,char* , ObjectInfo* const );
 
-static const ObjectInfo* const getValueByKey(const char* key,const ObjectInfo* const obj ){
-	int i=0,list_size=obj->typeInf->size[1];
-
-	while(list_size>i&&strcmp(key,obj->typeInf->subObjInfo[i].name))++i;
-
-	return i<list_size?obj->typeInf->subObjInfo+i:NULL;
-}
-
 static inline int verify(const char *_string, const regex_t *p_re){
 	int err_no = p_re?regexec(p_re, _string, 0, NULL, 0):-1;
 	return err_no;
@@ -200,7 +192,7 @@ static int object_convert(char* _string, ObjectInfo* const object,const regex_t 
 		tmp=_string[match[1].rm_eo];
 		_string[match[1].rm_eo]='\0';
 
-		o=getValueByKey(_string+match[1].rm_so,object);
+		o=fetchSub(object,_string+match[1].rm_so);
 
 		_string[match[1].rm_eo]=tmp;
 
