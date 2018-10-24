@@ -11,7 +11,7 @@ Map JSON and C Object to each other.
    boolean | unsigned char | 1: ture, 0: false
    object | struct |
 ### II.2 TypeInf & ObjectInfo
-   1. Mapping is based on *TypeInf* description of C Struct infomation and *ObjectInfo* description of C object information. They are all struct type, have the following relationships:
+   1. Mapping is dependent on [C type decription][1] with two structs. *TypeInf* describes type infomation and *ObjectInfo* describes object information. The relationship between them is as following:
       > ![](https://raw.github.com/riverstoneworks/CTypeInfo/master/doc/TypeInf_ObjectInfo.svg?sanitize=true)
    2. It is necessary to creates an *ObjectInfo* instance for the object to participate in conversion. For example:
       ```C
@@ -48,7 +48,7 @@ Map JSON and C Object to each other.
 		  .offset=(void*)&a
 	  }
 	  ```
-   3. See project [TypeInf][1] for more information.
+   3. See project [CTypeInfo][1] for more information about C type decription.
 ### II.3 Object Mapping
    1. In JSON, an object is a wrapper around a set of data, just like struct in C. And they can map to each other.
    2. It use Regex Match Tracer to grep key-value in JSON.
