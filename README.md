@@ -8,7 +8,7 @@ Map JSON and C Object to each other.
    numeric | arithmetic type | 
    string | char array or single char |
    array | array | 
-   boolean | unsigned char | 1: ture, 0: false
+   boolean | _Bool | 1: ture, 0: false
    object | struct |
 ### II.2 TypeInf & ObjectInfo
    1. Mapping is dependent on [C type decription][1] with two structs. *TypeInf* describes type infomation and *ObjectInfo* describes object information. The relationship between them is as following:
